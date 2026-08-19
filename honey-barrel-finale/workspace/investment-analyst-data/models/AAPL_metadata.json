@@ -1,0 +1,1 @@
+{"ticker": "AAPL", "algorithm": "xgboost", "features": ["Close", "Volume", "High", "Low", "RSI_14", "SMA_20", "SMA_50", "MACD", "MACD_Signal", "MACD_Diff", "BB_Position", "Daily_Return", "Volatility", "Price_Range", "Volume_Ratio"], "saved_at": "2026-08-06T22:50:38.790066"}

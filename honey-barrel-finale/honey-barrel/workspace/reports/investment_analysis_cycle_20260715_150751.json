@@ -1,0 +1,14 @@
+{
+  "order_id": "6fa896ac-5be4-47b8-ad64-068ce7a69dc7",
+  "order_status": "accepted",
+  "symbol": "AAPL",
+  "submitted_at": "2026-07-15T13:07:50.801868Z",
+  "action": "buy",
+  "executed_write": true,
+  "current_price": 305.3350,
+  "final_qty": 0.0800,
+  "target_notional": 25.00,
+  "confidence": 0.60,
+  "sizing_rationale": "confidence-based sizing (buy): target_notional=25.00 from confidence=0.60 and price=305.3350; qty_step=0.01; final_qty=0.0800",
+  "execution_mode": "direct_alpaca_fallback"
+}

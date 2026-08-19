@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HB UI Reports Navigator</title>
+  <style>
+    :root {
+      --bg: #07090c;
+      --bg2: #0d1117;
+      --bg3: #11161d;
+      --border: #1f2630;
+      --text: #d7dde4;
+      --muted: #6a7480;
+      --amber: #ffb000;
+      --cyan: #00bcd4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 14px;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 8px 10px;
+      margin-bottom: 12px;
+    }
+    .title {
+      color: var(--amber);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .muted { color: var(--muted); }
+    .home {
+      color: var(--cyan);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      background: var(--bg3);
+    }
+    .home:hover { color: var(--amber); }
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 41px 0 56px 0;
+    }
+    .logo-frame {
+      width: 19vw;
+      min-width: 120px;
+      max-width: 240px;
+    }
+    .logo-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: auto;
+    }
+    .footer a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+    .footer a.brand-link {
+      color: var(--amber);
+    }
+    .footer a:hover {
+      color: var(--amber);
+      text-decoration: underline;
+    }
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .quick a {
+      display: block;
+      text-decoration: none;
+      color: #9ecbff;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 10px;
+    }
+    .quick a.featured {
+      color: var(--amber);
+      border-color: var(--amber);
+      box-shadow: 0 0 0 1px rgba(255, 176, 0, 0.14) inset;
+      background: var(--bg3);
+    }
+    .quick a:hover {
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+    .section {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 10px;
+    }
+    .section h3 {
+      margin: 0 0 8px 0;
+      color: var(--amber);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .section .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 8px;
+    }
+    .section .card {
+      display: block;
+      text-decoration: none;
+      color: #9ecbff;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+    }
+    .section .card:hover {
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+    .section .card strong {
+      display: block;
+      margin-bottom: 3px;
+      color: inherit;
+    }
+    .section .card span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+    .quick .hint {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .idea {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 10px;
+    }
+    .cleanup {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .cleanup h3 {
+      margin: 0 0 8px 0;
+      color: var(--amber);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .cleanup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+    }
+    .field input[type="date"] {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 6px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    .targets {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 6px 10px;
+      margin-bottom: 10px;
+    }
+    .targets label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font-size: 12px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .btn {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--amber); color: var(--amber); }
+    .btn.danger { border-color: #7f2a2a; color: #ff9c9c; }
+    .btn.danger:hover { border-color: #ff4d4d; color: #ffb9b9; }
+    .cleanup-output {
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      padding: 8px;
+      min-height: 72px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .idea h3 {
+      margin: 0 0 8px 0;
+      color: var(--amber);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .idea ul { margin: 0; padding-left: 18px; }
+    .idea li { margin: 4px 0; }
+    code {
+      color: var(--cyan);
+      background: rgba(0, 188, 212, 0.08);
+      padding: 1px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="title">HONEY-BARREL // UI REPORTS NAVIGATOR</div>
+        <div class="muted">Single place for reports and runtime logs navigation.</div>
+      </div>
+      <a class="home" href="/ui/">Back to Dashboard</a>
+    </div>
+
+    <div class="quick">
+      <a href="/reports/list?path=">
+        reports/
+        <span class="hint">Root reports catalog</span>
+      </a>
+      <a href="/reports/list?path=hourly_watchlist">
+        reports/hourly_watchlist/
+        <span class="hint">Hourly watchlist markdown reports</span>
+      </a>
+      <a href="/reports/match?pattern=.cron_state/cron_*.log">
+        /reports/.cron_state/cron_*.log
+        <span class="hint">Cron execution logs grouped by ticker/task</span>
+      </a>
+      <a href="/reports/match?pattern=.cron_state/run_*.log">
+        /reports/.cron_state/run_*.log
+        <span class="hint">Per-cycle run logs with detailed trace</span>
+      </a>
+      <a href="/reports/match?pattern=.cron_state/cron_*.log&latest=20">
+        cron logs (Latest 20)
+        <span class="hint">Fast triage mode with smaller result set</span>
+      </a>
+      <a href="/reports/match?pattern=.cron_state/run_*.log&latest=20">
+        run logs (Latest 20)
+        <span class="hint">Jump quickly to newest cycles</span>
+      </a>
+      <a href="/reports/stack-summary">
+        honey-barrel stack summary
+        <span class="hint">All key counters in one report</span>
+      </a>
+      <a class="featured" href="/reports/view/.cron_state/daily_investment_watchlist_report_generator.log?tail=1&latest=200&refresh=5&alerts_only=1">
+        daily_investment_watchlist_report_generator.log
+        <span class="hint">Alerts-only viewer for the daily investment watchlist generator</span>
+      </a>
+    </div>
+
+    <section class="cleanup">
+      <h3>Cleanup Reports (Date Range)</h3>
+      <div class="cleanup-grid">
+        <label class="field">From:
+          <input id="cleanup-from" type="date" />
+        </label>
+        <label class="field">To:
+          <input id="cleanup-to" type="date" />
+        </label>
+      </div>
+      <div class="targets">
+        <label><input type="checkbox" value="hourly_watchlist" checked /> hourly_watchlist</label>
+        <label><input type="checkbox" value="failed_cycles" checked /> failed_cycles</label>
+        <label><input type="checkbox" value="investment_cycles" checked /> investment_cycles</label>
+        <label><input type="checkbox" value="run_logs" /> run_logs</label>
+        <label><input type="checkbox" value="cron_logs" /> cron_logs</label>
+        <label><input type="checkbox" value="latest_aliases" /> latest_aliases</label>
+      </div>
+      <div class="actions">
+        <button id="cleanup-preview" class="btn" type="button">Preview</button>
+        <button id="cleanup-export" class="btn" type="button">Export CSV</button>
+        <button id="cleanup-delete" class="btn danger" type="button">Delete In Range</button>
+      </div>
+      <div id="cleanup-output" class="cleanup-output">Pick date range and press Preview.</div>
+    </section>
+
+    <div class="logo-wrap">
+      <div class="logo-frame">
+        <img src="/ui/honey_barrel_logo_260717_oval.png" alt="Honey-Barrel oval logo" />
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>(c) 2026 <a class="brand-link" href="https://honeybarrel.org">HONEY-BARREL Labs</a>  *  <a href="/ui/reports/">REPORTS NAVIGATOR (front)</a></span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const fromEl = document.getElementById('cleanup-from');
+      const toEl = document.getElementById('cleanup-to');
+      const outputEl = document.getElementById('cleanup-output');
+      const previewBtn = document.getElementById('cleanup-preview');
+      const exportBtn = document.getElementById('cleanup-export');
+      const deleteBtn = document.getElementById('cleanup-delete');
+
+      function formatDate(d) {
+        return d.toISOString().slice(0, 10);
+      }
+
+      const now = new Date();
+      const weekAgo = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
+      fromEl.value = formatDate(weekAgo);
+      toEl.value = formatDate(now);
+
+      function selectedTargets() {
+        return Array.from(document.querySelectorAll('.targets input[type="checkbox"]:checked'))
+          .map((el) => el.value);
+      }
+
+      async function runCleanup(dryRun) {
+        const dateFrom = fromEl.value;
+        const dateTo = toEl.value;
+        const targets = selectedTargets();
+
+        if (!dateFrom || !dateTo) {
+          outputEl.textContent = 'Set both From and To dates.';
+          return;
+        }
+        if (targets.length === 0) {
+          outputEl.textContent = 'Select at least one target group.';
+          return;
+        }
+
+        if (!dryRun) {
+          const ok = confirm(
+            `Delete reports from ${dateFrom} to ${dateTo} for: ${targets.join(', ')}?`
+          );
+          if (!ok) return;
+        }
+
+        previewBtn.disabled = true;
+        exportBtn.disabled = true;
+        deleteBtn.disabled = true;
+        outputEl.textContent = dryRun ? 'Running preview...' : 'Deleting files...';
+
+        try {
+          const resp = await fetch('/api/reports/cleanup-range', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              date_from: dateFrom,
+              date_to: dateTo,
+              targets,
+              dry_run: dryRun,
+            }),
+          });
+
+          const data = await resp.json();
+          if (!resp.ok || !data.success) {
+            outputEl.textContent = `ERROR: ${data.detail || 'request failed'}`;
+            return;
+          }
+
+          const lines = [
+            `${dryRun ? 'PREVIEW' : 'DELETE'} OK`,
+            `range: ${data.date_from} -> ${data.date_to}`,
+            `targets: ${data.targets.join(', ')}`,
+            `matched: ${data.matched_count}`,
+            `in range: ${data.in_range_count}`,
+            `deleted: ${data.deleted_count}`,
+            `failed: ${data.failed_count}`,
+            '',
+            'sample:',
+          ];
+
+          const sample = (dryRun ? data.preview : data.deleted) || [];
+          if (sample.length === 0) {
+            lines.push('(no files)');
+          } else {
+            sample.slice(0, 20).forEach((p) => lines.push(`- ${p}`));
+          }
+
+          outputEl.textContent = lines.join('\n');
+        } catch (err) {
+          outputEl.textContent = `ERROR: ${err && err.message ? err.message : String(err)}`;
+        } finally {
+          previewBtn.disabled = false;
+          exportBtn.disabled = false;
+          deleteBtn.disabled = false;
+        }
+      }
+
+      async function runExportCsv() {
+        const dateFrom = fromEl.value;
+        const dateTo = toEl.value;
+        const targets = selectedTargets();
+
+        if (!dateFrom || !dateTo) {
+          outputEl.textContent = 'Set both From and To dates.';
+          return;
+        }
+        if (targets.length === 0) {
+          outputEl.textContent = 'Select at least one target group.';
+          return;
+        }
+
+        previewBtn.disabled = true;
+        exportBtn.disabled = true;
+        deleteBtn.disabled = true;
+        outputEl.textContent = 'Building CSV export...';
+
+        try {
+          const resp = await fetch('/api/reports/cleanup-range-export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              date_from: dateFrom,
+              date_to: dateTo,
+              targets,
+              dry_run: true,
+            }),
+          });
+
+          if (!resp.ok) {
+            let detail = 'request failed';
+            try {
+              const err = await resp.json();
+              detail = err.detail || detail;
+            } catch (_) {
+              // Keep fallback detail.
+            }
+            outputEl.textContent = `ERROR: ${detail}`;
+            return;
+          }
+
+          const blob = await resp.blob();
+          const disposition = resp.headers.get('Content-Disposition') || '';
+          const filenameMatch = disposition.match(/filename=([^;]+)/i);
+          const filename = filenameMatch ? filenameMatch[1].replace(/"/g, '') : `reports_cleanup_${dateFrom}_to_${dateTo}.csv`;
+          const objectUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = objectUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(objectUrl);
+          outputEl.textContent = `CSV exported: ${filename}`;
+        } catch (err) {
+          outputEl.textContent = `ERROR: ${err && err.message ? err.message : String(err)}`;
+        } finally {
+          previewBtn.disabled = false;
+          exportBtn.disabled = false;
+          deleteBtn.disabled = false;
+        }
+      }
+
+      previewBtn.addEventListener('click', () => runCleanup(true));
+      exportBtn.addEventListener('click', runExportCsv);
+      deleteBtn.addEventListener('click', () => runCleanup(false));
+    })();
+  </script>
+</body>
+</html>

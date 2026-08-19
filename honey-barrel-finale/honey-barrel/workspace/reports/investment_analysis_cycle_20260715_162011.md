@@ -1,0 +1,13 @@
+# Investment Analysis Cycle (Direct Alpaca Fallback)
+
+- symbol: AAPL
+- order_id: 196c1936-b965-4b11-8d2b-24080cbcb06d
+- order_status: filled
+- submitted_at: 2026-07-15T14:20:58.751492Z
+- action: sell
+- executed_write: true
+- current_price: 325.4350
+- final_qty: 0.0700
+- target_notional: 25.00
+- confidence: 0.40
+- sizing_rationale: confidence-based sizing (sell): target_notional=25.00 from confidence=0.40 and price=325.4350; qty_step=0.01; final_qty=0.0700

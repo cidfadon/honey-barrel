@@ -1,0 +1,1 @@
+{"ticker": "AMD", "algorithm": "xgboost", "features": ["Close", "Volume", "High", "Low", "RSI_14", "SMA_20", "SMA_50", "MACD", "MACD_Signal", "MACD_Diff", "BB_Position", "Daily_Return", "Volatility", "Price_Range", "Volume_Ratio"], "saved_at": "2026-07-28T21:23:45.032293"}

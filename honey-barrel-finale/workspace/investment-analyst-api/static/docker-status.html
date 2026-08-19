@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docker Status</title>
+  <style>
+    :root {
+      --bg: #080d12;
+      --bg-panel: #0f1720;
+      --line: #1f2d3a;
+      --text: #d6e2ef;
+      --muted: #8ea2b6;
+      --ok: #21ff95;
+      --bad: #ff3a4f;
+      --amber: #ffb000;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(1000px 450px at 12% -10%, rgba(12, 58, 84, 0.42), transparent 70%),
+        radial-gradient(900px 420px at 88% 110%, rgba(114, 24, 24, 0.28), transparent 70%),
+        var(--bg);
+      color: var(--text);
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      padding: 16px;
+    }
+
+    .shell {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(20, 30, 42, 0.78), rgba(13, 20, 30, 0.92));
+      max-width: 1080px;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.35);
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(6, 11, 17, 0.75);
+    }
+
+    .title {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--amber);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid #33516b;
+      background: linear-gradient(180deg, #1a3348, #14283a);
+      color: #d9ecff;
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+    }
+
+    .btn:hover { border-color: #4e7aa0; }
+
+    .btn.warn {
+      border-color: #6e4f1f;
+      background: linear-gradient(180deg, #4f3918, #392a12);
+      color: #ffd89b;
+    }
+
+    .btn.warn:hover { border-color: #b88638; }
+
+    .btn.danger {
+      border-color: #73303a;
+      background: linear-gradient(180deg, #4d1f26, #38151b);
+      color: #ffc7cf;
+    }
+
+    .btn.danger:hover { border-color: #c65267; }
+
+    .btn[disabled] {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    thead th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--line);
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      border-bottom: 1px solid rgba(31, 45, 58, 0.75);
+      padding: 5px 10px;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover { background: rgba(40, 66, 92, 0.16); }
+
+    .name {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .status-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    }
+
+    .dot.ok {
+      background: var(--ok);
+      box-shadow: 0 0 8px rgba(33, 255, 149, 0.85), 0 0 16px rgba(33, 255, 149, 0.35);
+    }
+
+    .dot.bad {
+      background: var(--bad);
+      box-shadow: 0 0 8px rgba(255, 58, 79, 0.85), 0 0 16px rgba(255, 58, 79, 0.3);
+      animation: blink-red 1s steps(2, end) infinite;
+    }
+
+    @keyframes blink-red {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    .state-ok { color: var(--ok); }
+    .state-bad { color: var(--bad); }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .progress-wrap {
+      min-width: 180px;
+      max-width: 320px;
+    }
+
+    .progress-label {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .progress-bar {
+      height: 5px;
+      border: 1px solid #274259;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(9, 17, 25, 0.85);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2f7cb8, #68d2ff);
+      box-shadow: 0 0 8px rgba(80, 205, 255, 0.5);
+      transition: width 0.25s ease;
+    }
+
+    .progress-fill.ok {
+      background: linear-gradient(90deg, #1ea86a, #34ff9e);
+      box-shadow: 0 0 8px rgba(33, 255, 149, 0.5);
+    }
+
+    .progress-fill.err {
+      background: linear-gradient(90deg, #aa2d3d, #ff4f66);
+      box-shadow: 0 0 8px rgba(255, 58, 79, 0.5);
+    }
+
+    .foot {
+      color: var(--muted);
+      font-size: 11px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: rgba(6, 11, 17, 0.65);
+    }
+
+    .error {
+      color: var(--bad);
+      font-size: 12px;
+      padding: 12px;
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 10px; }
+      thead th:nth-child(4), tbody td:nth-child(4), thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <div class="title">DOCKER STATUS</div>
+        <div class="meta">View: Main 7 containers of Honey-Barrel Stack should be visible.</div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="/ui/" target="_top">BACK TO DASHBOARD</a>
+        <a class="btn" href="/ui/settings.html">SETTINGS</a>
+        <button class="btn" id="reload-btn" type="button">RELOAD</button>
+      </div>
+    </div>
+
+    <table aria-label="Docker container status">
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Neon</th>
+          <th>State</th>
+          <th>Health</th>
+          <th>Actions</th>
+          <th>Progress</th>
+        </tr>
+      </thead>
+      <tbody id="status-body">
+        <tr><td colspan="6" class="meta">Loading container status...</td></tr>
+      </tbody>
+    </table>
+
+    <div id="status-error" class="error" hidden></div>
+
+    <div class="foot">
+      <span id="updated-at">Updated: -</span>
+      <span id="socket-state">Docker socket: -</span>
+    </div>
+  </div>
+
+  <script>
+    const statusBody = document.getElementById('status-body');
+    const updatedAt = document.getElementById('updated-at');
+    const socketState = document.getElementById('socket-state');
+    const statusError = document.getElementById('status-error');
+    const reloadBtn = document.getElementById('reload-btn');
+    const activeJobs = new Map();
+    const jobsByContainer = new Map();
+
+    function esc(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function stateLabel(item) {
+      const health = item.health == null ? 'none' : String(item.health);
+      const status = item.status == null ? 'unknown' : String(item.status);
+      return `(${health}) ${status}`;
+    }
+
+    function renderRows(items) {
+      if (!Array.isArray(items) || items.length === 0) {
+        statusBody.innerHTML = '<tr><td colspan="6" class="meta">No containers to display.</td></tr>';
+        return;
+      }
+
+      statusBody.innerHTML = items.map((item) => {
+        const ok = Boolean(item.healthy_running);
+        const dotClass = ok ? 'dot ok' : 'dot bad';
+        const stateClass = ok ? 'state-ok' : 'state-bad';
+        const statusText = stateLabel(item);
+        const container = String(item.name || '');
+        const job = jobsByContainer.get(container) || null;
+        const runningJob = job && (job.status === 'queued' || job.status === 'running');
+        const disabled = runningJob ? 'disabled' : '';
+
+        let progressHtml = '<span class="meta">idle</span>';
+        if (job) {
+          const pct = Math.max(0, Math.min(100, Number(job.progress || 0)));
+          const fillClass = job.status === 'success' ? 'progress-fill ok' : (job.status === 'failed' ? 'progress-fill err' : 'progress-fill');
+          const label = job.status === 'failed'
+            ? `failed ${pct}%${job.error ? ` - ${String(job.error)}` : ''}`
+            : `${job.action || 'job'} ${job.status} ${pct}%`;
+          progressHtml = `
+            <div class="progress-wrap">
+              <div class="progress-label" title="${esc(label)}">${esc(label)}</div>
+              <div class="progress-bar"><div class="${fillClass}" style="width:${pct}%"></div></div>
+            </div>
+          `;
+        }
+
+        return `
+          <tr>
+            <td class="name">${esc(item.name)}</td>
+            <td><span class="status-wrap"><span class="${dotClass}"></span><span class="${stateClass}">${ok ? 'OK' : 'ALERT'}</span></span></td>
+            <td class="${stateClass}">${esc(statusText)}</td>
+            <td>${esc(item.health ?? '-')}</td>
+            <td>
+              <div class="row-actions">
+                <button class="btn warn" type="button" data-action="rebuild_no_cache" data-container="${esc(container)}" ${disabled}>Re-build (no-cache)</button>
+                <button class="btn danger" type="button" data-action="restart" data-container="${esc(container)}" ${disabled}>Re-start</button>
+              </div>
+            </td>
+            <td>${progressHtml}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function refreshJobStatuses() {
+      const entries = Array.from(activeJobs.entries());
+      if (entries.length === 0) return;
+
+      await Promise.all(entries.map(async ([container, jobId]) => {
+        try {
+          const response = await fetch(`/api/stack/docker-action/${encodeURIComponent(jobId)}`, { cache: 'no-store' });
+          const payload = await response.json();
+          if (!response.ok || !payload.success || !payload.job) return;
+
+          jobsByContainer.set(container, payload.job);
+          if (payload.job.status !== 'queued' && payload.job.status !== 'running') {
+            activeJobs.delete(container);
+          }
+        } catch (_error) {
+          // Keep current snapshot and retry on next tick.
+        }
+      }));
+    }
+
+    async function startAction(container, action) {
+      try {
+        const response = await fetch('/api/stack/docker-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ container, action }),
+        });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Failed to start docker action');
+        }
+
+        activeJobs.set(container, payload.job_id);
+        jobsByContainer.set(container, {
+          job_id: payload.job_id,
+          container,
+          action,
+          status: payload.status || 'queued',
+          progress: Number(payload.progress || 0),
+          current_step: 'queued',
+        });
+        await loadDockerStatus();
+      } catch (error) {
+        statusError.hidden = false;
+        statusError.textContent = `Error: ${error && error.message ? error.message : String(error)}`;
+      }
+    }
+
+    async function loadDockerStatus() {
+      statusError.hidden = true;
+      try {
+        await refreshJobStatuses();
+        const response = await fetch('/api/stack/docker-status', { cache: 'no-store' });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Failed to fetch docker status');
+        }
+
+        const serverActiveJobs = payload.active_jobs && typeof payload.active_jobs === 'object'
+          ? payload.active_jobs
+          : {};
+        for (const [container, job] of Object.entries(serverActiveJobs)) {
+          if (!job || typeof job !== 'object') continue;
+          jobsByContainer.set(container, job);
+          if (job.job_id && (job.status === 'queued' || job.status === 'running')) {
+            activeJobs.set(container, job.job_id);
+          }
+        }
+
+        renderRows(payload.containers);
+        const ts = Number(payload.timestamp || 0);
+        updatedAt.textContent = ts > 0 ? `Updated: ${new Date(ts * 1000).toLocaleString()}` : 'Updated: -';
+        socketState.textContent = payload.docker_socket_available ? 'Docker socket: available' : 'Docker socket: unavailable';
+      } catch (error) {
+        statusBody.innerHTML = '<tr><td colspan="6" class="meta">Status unavailable.</td></tr>';
+        statusError.hidden = false;
+        statusError.textContent = `Error: ${error && error.message ? error.message : String(error)}`;
+      }
+    }
+
+    statusBody.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action][data-container]');
+      if (!button) return;
+      if (button.disabled) return;
+
+      const action = button.getAttribute('data-action');
+      const container = button.getAttribute('data-container');
+      if (!action || !container) return;
+
+      startAction(container, action);
+    });
+
+    reloadBtn.addEventListener('click', () => { loadDockerStatus(); });
+    loadDockerStatus();
+    setInterval(() => { loadDockerStatus(); }, 2000);
+  </script>
+</body>
+</html>

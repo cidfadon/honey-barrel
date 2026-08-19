@@ -1,0 +1,13 @@
+# Investment Analysis Cycle (Direct Alpaca Fallback)
+
+- symbol: AMZN
+- order_id: 7328338b-b3d4-4be3-ac0e-178732a5086a
+- order_status: accepted
+- submitted_at: 2026-07-15T13:20:25.700220Z
+- action: buy
+- executed_write: true
+- current_price: 249.0650
+- final_qty: 0.1000
+- target_notional: 25.00
+- confidence: 0.60
+- sizing_rationale: confidence-based sizing (buy): target_notional=25.00 from confidence=0.60 and price=249.0650; qty_step=0.01; final_qty=0.1000

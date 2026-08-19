@@ -1,0 +1,9 @@
+{
+  "name": "mcp-gateway",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "express": "^5.0.0",
+    "yaml": "^2.5.0"
+  }
+}

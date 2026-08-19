@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strategy Attachment</title>
+  <style>
+    :root {
+      --bg: #07090c;
+      --bg2: #0d1117;
+      --border: #1f2630;
+      --text: #d7dde4;
+      --muted: #6a7480;
+      --accent: #ffb000;
+      --ok: #8fe3a4;
+      --err: #ff7d7d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 13px/1.4 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .title {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin: 0;
+      text-transform: uppercase;
+    }
+    .muted { color: var(--muted); }
+    .topbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0 14px 0;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      padding: 6px 10px;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { border-color: var(--accent); color: var(--accent); }
+    .panel {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .label {
+      display: block;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin: 0 0 6px 0;
+      font-size: 12px;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+    .strategy-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .strategy-file-input {
+      flex: 1 1 320px;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--text);
+      padding: 6px 8px;
+      font: 12px/1.35 "JetBrains Mono", ui-monospace, monospace;
+    }
+    .strategy-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px;
+      max-height: 340px;
+      overflow: auto;
+    }
+    .strategy-list-empty {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .strategy-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+      border-radius: 6px;
+    }
+    .strategy-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font: 12px/1.35 "JetBrains Mono", ui-monospace, monospace;
+      min-width: 0;
+    }
+    .strategy-checkbox-item span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .strategy-preview {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--text);
+      white-space: pre-wrap;
+      max-height: 280px;
+      overflow: auto;
+      font: 11px/1.45 "JetBrains Mono", ui-monospace, monospace;
+    }
+    .status {
+      min-height: 20px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+    code {
+      background: #0b0f14;
+      border: 1px solid var(--border);
+      padding: 1px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">STRATEGY</h1>
+    <div class="muted">Financial Strategy Attachment management for the runner prompt pipeline.</div>
+
+    <div class="topbar">
+      <a class="btn" href="/ui/" target="_top">BACK TO DASHBOARD</a>
+      <a class="btn" href="/ui/prompt-engineering.html">OPEN PROMPT ENGINEERING / RUNNER SETUP</a>
+      <button id="reload-btn" class="btn" type="button">RELOAD</button>
+      <button id="save-btn" class="btn primary" type="button">SAVE STRATEGY SETTINGS</button>
+      <span class="muted">API: <code>/api/prompt-engineering/config</code></span>
+    </div>
+
+    <section class="panel">
+      <span class="label">Financial Strategy Attachment</span>
+      <div class="checkbox-row">
+        <input id="include-financial-strategy" type="checkbox" />
+        <label for="include-financial-strategy">Attach financial strategy markdown file(s) to runner prompt</label>
+      </div>
+
+      <div class="strategy-row">
+        <input id="financial-strategy-file" class="strategy-file-input" spellcheck="false" placeholder="e.g. strategies/growth.md" />
+        <button id="upload-strategy-btn" class="btn" type="button">UPLOAD .MD</button>
+        <div class="muted">Source directory: <code>/workspace/docs/strategies</code></div>
+      </div>
+
+      <div id="strategy-list" class="strategy-list">
+        <div class="strategy-list-empty">loading...</div>
+      </div>
+
+      <div class="muted" style="margin-top: 6px;">Files are listed in one column. Selected files are appended to prompt in selected order.</div>
+      <input id="financial-strategy-upload" type="file" accept=".md,text/markdown" hidden />
+      <div id="strategy-preview" class="strategy-preview">Choose a strategy file and click PREVIEW to inspect Markdown content.</div>
+    </section>
+
+    <div id="status" class="status muted"></div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const saveBtn = document.getElementById('save-btn');
+    const reloadBtn = document.getElementById('reload-btn');
+    const includeFinancialStrategyEl = document.getElementById('include-financial-strategy');
+    const financialStrategyFileEl = document.getElementById('financial-strategy-file');
+    const uploadStrategyBtn = document.getElementById('upload-strategy-btn');
+    const strategyUploadEl = document.getElementById('financial-strategy-upload');
+    const strategyPreviewEl = document.getElementById('strategy-preview');
+    const strategyListEl = document.getElementById('strategy-list');
+
+    let currentPrompt = '';
+    let currentParams = {};
+
+    function setStatus(msg, kind) {
+      statusEl.textContent = msg || '';
+      statusEl.className = 'status ' + (kind || 'muted');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function mapParams(params) {
+      const out = {};
+      if (!Array.isArray(params)) return out;
+      params.forEach((row) => {
+        if (!row || !row.name) return;
+        out[row.name] = row.default ?? '';
+      });
+      return out;
+    }
+
+    function renderStrategyList(files, selected) {
+      const selectedSet = new Set(selected || []);
+      if (!Array.isArray(files) || files.length === 0) {
+        strategyListEl.innerHTML = '<div class="strategy-list-empty">No strategy files found in /workspace/docs/strategies</div>';
+        return;
+      }
+
+      strategyListEl.innerHTML = files.map((item) => {
+        const checked = selectedSet.has(item) ? 'checked' : '';
+        return `
+          <div class="strategy-row-item">
+            <label class="strategy-checkbox-item">
+              <input type="checkbox" value="${escapeHtml(item)}" ${checked} />
+              <span title="${escapeHtml(item)}">${escapeHtml(item)}</span>
+            </label>
+            <button class="btn" type="button" data-preview-path="${escapeHtml(item)}">PREVIEW</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectedStrategies() {
+      return Array.from(strategyListEl.querySelectorAll('input[type="checkbox"]:checked'))
+        .map((el) => el.value.trim())
+        .filter(Boolean);
+    }
+
+    async function loadConfig() {
+      setStatus('Loading strategy configuration...', 'muted');
+      saveBtn.disabled = true;
+      reloadBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/prompt-engineering/config', { cache: 'no-store' });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Load failed');
+        }
+
+        currentPrompt = payload.prompt || '';
+        currentParams = mapParams(payload.params || []);
+
+        includeFinancialStrategyEl.checked = Boolean(payload.include_financial_strategy);
+        financialStrategyFileEl.value = payload.financial_strategy_file || '';
+
+        const strategyFiles = Array.isArray(payload.available_financial_strategy_files) ? payload.available_financial_strategy_files : [];
+        const selected = Array.isArray(payload.financial_strategy_files) ? payload.financial_strategy_files : [];
+        renderStrategyList(strategyFiles, selected);
+
+        strategyPreviewEl.textContent = strategyFiles.length
+          ? 'Choose a strategy file and click PREVIEW to inspect Markdown content.'
+          : 'No strategy files found yet.';
+
+        setStatus(`Loaded ${strategyFiles.length} strategy file(s).`, 'ok');
+      } catch (err) {
+        setStatus(`Load error: ${err.message || err}`, 'err');
+      } finally {
+        saveBtn.disabled = false;
+        reloadBtn.disabled = false;
+      }
+    }
+
+    async function saveConfig() {
+      setStatus('Saving strategy settings...', 'muted');
+      saveBtn.disabled = true;
+      reloadBtn.disabled = true;
+
+      try {
+        const selected = selectedStrategies();
+        const body = {
+          prompt: currentPrompt,
+          params: currentParams,
+          include_financial_strategy: includeFinancialStrategyEl.checked,
+          financial_strategy_file: selected.join(','),
+          financial_strategy_files: selected,
+        };
+
+        const response = await fetch('/api/prompt-engineering/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Save failed');
+        }
+
+        financialStrategyFileEl.value = payload.financial_strategy_file || selected.join(',');
+        setStatus('Strategy settings saved.', 'ok');
+      } catch (err) {
+        setStatus(`Save error: ${err.message || err}`, 'err');
+      } finally {
+        saveBtn.disabled = false;
+        reloadBtn.disabled = false;
+      }
+    }
+
+    async function uploadStrategyFile() {
+      const file = strategyUploadEl.files?.[0];
+      if (!file) {
+        setStatus('Choose a .md file first.', 'err');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      setStatus('Uploading strategy file...', 'muted');
+      uploadStrategyBtn.disabled = true;
+      try {
+        const response = await fetch('/api/prompt-engineering/financial-strategy/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Upload failed');
+        }
+
+        includeFinancialStrategyEl.checked = true;
+        setStatus(`Uploaded ${payload.path || file.name}.`, 'ok');
+        await loadConfig();
+      } catch (err) {
+        setStatus(`Upload error: ${err.message || err}`, 'err');
+      } finally {
+        uploadStrategyBtn.disabled = false;
+        strategyUploadEl.value = '';
+      }
+    }
+
+    strategyListEl.addEventListener('change', () => {
+      const selected = selectedStrategies();
+      financialStrategyFileEl.value = selected.join(',');
+      if (selected.length > 0) includeFinancialStrategyEl.checked = true;
+    });
+
+    strategyListEl.addEventListener('click', async (event) => {
+      const button = event.target.closest('button[data-preview-path]');
+      if (!button) return;
+
+      const path = button.getAttribute('data-preview-path');
+      if (!path) return;
+
+      strategyPreviewEl.textContent = 'Loading preview...';
+      try {
+        const response = await fetch(`/api/docs/raw?path=${encodeURIComponent(path)}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'text/plain' },
+        });
+        const text = await response.text();
+
+        if (!response.ok) {
+          throw new Error(text || 'Preview failed');
+        }
+        strategyPreviewEl.textContent = text || '(empty file)';
+      } catch (err) {
+        strategyPreviewEl.textContent = `Preview error: ${err.message || err}`;
+      }
+    });
+
+    saveBtn.addEventListener('click', saveConfig);
+    reloadBtn.addEventListener('click', loadConfig);
+    uploadStrategyBtn.addEventListener('click', () => strategyUploadEl.click());
+    strategyUploadEl.addEventListener('change', uploadStrategyFile);
+
+    loadConfig();
+  </script>
+</body>
+</html>

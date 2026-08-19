@@ -1,0 +1,5 @@
+workspace/
+linuxbrew/
+*.log
+tmp/
+cache/

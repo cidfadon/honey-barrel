@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trading212 × OpenClaw — Admin</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --txt: #e6edf3; --mute: #8b949e; --acc: #58a6ff; --buy: #3fb950; --sell: #f85149;
+    --font: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font-family: var(--font);
+         padding: 32px 48px; }
+  h1 { margin: 0 0 4px; font-weight: 600; letter-spacing: -0.5px; }
+  h1 span { color: var(--acc); }
+  .sub { color: var(--mute); margin-bottom: 32px; }
+  h2 { margin: 32px 0 12px; font-size: 14px; text-transform: uppercase;
+       letter-spacing: 2px; color: var(--mute); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+          border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+           font-size: 13px; vertical-align: top; }
+  th { background: #21262d; color: var(--mute); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .BUY  { color: var(--buy); font-weight: 600; }
+  .SELL { color: var(--sell); font-weight: 600; }
+  .HOLD { color: var(--mute); }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word;
+        font-size: 12px; color: var(--mute); max-width: 420px; }
+  .tag { display: inline-block; padding: 1px 8px; border: 1px solid var(--border);
+         border-radius: 999px; font-size: 11px; color: var(--mute); }
+</style>
+</head>
+<body>
+  <h1>trading212 <span>×</span> openclaw</h1>
+  <div class="sub">last 20 LLM analyses · last 20 orders</div>
+
+  <h2>llm analyses</h2>
+  <table>
+    <tr><th>ts</th><th>model</th><th>action</th><th>ticker</th><th>qty</th>
+        <th>conf.</th><th>rationale</th></tr>
+    {% for a in analyses %}
+    <tr>
+      <td>{{ a.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      <td><span class="tag">{{ a.model }}</span></td>
+      <td class="{{ (a.decision or {}).get('action', 'HOLD') }}">
+        {{ (a.decision or {}).get('action', '—') }}
+      </td>
+      <td>{{ (a.decision or {}).get('ticker') or '—' }}</td>
+      <td>{{ (a.decision or {}).get('quantity') or '—' }}</td>
+      <td>{{ '%.0f%%' | format(100 * ((a.decision or {}).get('confidence') or 0)) }}</td>
+      <td><pre>{{ (a.decision or {}).get('rationale', '') }}</pre></td>
+    </tr>
+    {% endfor %}
+    {% if not analyses %}
+    <tr><td colspan="7" style="color: var(--mute); text-align: center;">no analyses yet</td></tr>
+    {% endif %}
+  </table>
+
+  <h2>orders</h2>
+  <table>
+    <tr><th>ts</th><th>id</th><th>t212 id</th><th>ticker</th><th>side</th>
+        <th>qty</th><th>type</th><th>limit</th><th>status</th></tr>
+    {% for o in orders %}
+    <tr>
+      <td>{{ o.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      <td>{{ o.id }}</td>
+      <td>{{ o.t212_order_id or '—' }}</td>
+      <td>{{ o.ticker }}</td>
+      <td class="{{ o.side }}">{{ o.side }}</td>
+      <td>{{ o.qty }}</td>
+      <td><span class="tag">{{ o.order_type }}</span></td>
+      <td>{{ o.limit_price or '—' }}</td>
+      <td>{{ o.status }}</td>
+    </tr>
+    {% endfor %}
+    {% if not orders %}
+    <tr><td colspan="9" style="color: var(--mute); text-align: center;">no orders yet</td></tr>
+    {% endif %}
+  </table>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "job_name": "Daily Investment Watchlist Report Generator",
+  "schedule": "* */1 * * *",
+  "cycle_count": 220,
+  "status": "failed",
+  "failed_at": "2026-07-08T23:35:01+02:00",
+  "exit_code": "simulated-execution-detected",
+  "orders_before": "20",
+  "orders_after": "",
+  "order_id": "",
+  "order_status": "",
+  "invalid_json_report": "",
+  "invalid_md_report": "",
+  "run_log": "/home/me/git-repo/honey-barrel-finale/workspace/reports/.cron_state/run_220.log",
+  "report_write_verified": false,
+  "note": "Cycle failed before producing a verified investment analysis report artifact."
+}

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crontabs Editor</title>
+  <style>
+    :root {
+      --bg: #070b11;
+      --bg2: #0f1720;
+      --line: #213042;
+      --text: #d8e3ef;
+      --muted: #8ea2b6;
+      --amber: #ffb000;
+      --cyan: #74d4ff;
+      --ok: #3bffa5;
+      --err: #ff5b70;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 340px at 10% -15%, rgba(17, 66, 94, 0.36), transparent 72%),
+        radial-gradient(900px 460px at 88% 115%, rgba(78, 24, 24, 0.3), transparent 72%),
+        var(--bg);
+      color: var(--text);
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      padding: 14px;
+    }
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(16, 27, 39, 0.86), rgba(11, 19, 29, 0.95));
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    }
+    .top {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .title { color: var(--amber); letter-spacing: 0.08em; text-transform: uppercase; font-size: 13px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid #35506b;
+      background: linear-gradient(180deg, #1a3348, #14283a);
+      color: #d9ecff;
+      text-decoration: none;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .btn:hover { border-color: #4f7ca3; }
+    .btn.ok {
+      border-color: #207553;
+      background: linear-gradient(180deg, #1a553d, #133a2a);
+      color: #d5ffe9;
+    }
+    .btn.warn {
+      border-color: #6d5422;
+      background: linear-gradient(180deg, #4a3a19, #332913);
+      color: #ffe4b0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 72vh;
+    }
+    .left {
+      border-right: 1px solid var(--line);
+      padding: 12px;
+      background: rgba(7, 13, 20, 0.66);
+    }
+    .list-title { color: var(--muted); text-transform: uppercase; font-size: 11px; margin-bottom: 8px; letter-spacing: 0.08em; }
+    .items { display: flex; flex-direction: column; gap: 6px; }
+    .user-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid #293b4e;
+      background: rgba(18, 30, 42, 0.9);
+      color: var(--text);
+      padding: 8px;
+      border-radius: 8px;
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .user-item:hover { border-color: var(--amber); }
+    .user-item.active { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(116, 212, 255, 0.3) inset; }
+    .user-meta { color: var(--muted); font-size: 10px; line-height: 1.2; margin-top: 2px; overflow-wrap: anywhere; }
+    .user-item .user-meta:last-child { font-size: 9px; }
+    .right { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .meta { color: var(--muted); font-size: 12px; min-height: 18px; }
+    select {
+      border: 1px solid #35506b;
+      background: #0b131c;
+      color: var(--text);
+      border-radius: 7px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    .editor {
+      width: 100%;
+      min-height: 62vh;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b131c;
+      overflow: hidden;
+    }
+    #editor {
+      width: 100%;
+      height: 62vh;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .status { font-size: 12px; min-height: 18px; }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+    .status.muted { color: var(--muted); }
+    .diff-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b131c;
+      padding: 8px;
+      min-height: 120px;
+      max-height: 250px;
+      overflow: auto;
+      white-space: pre;
+      color: #c9d9e9;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .diff-box .add { color: #7fffb7; }
+    .diff-box .del { color: #ff9baa; }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .left { border-right: 0; border-bottom: 1px solid var(--line); }
+      #editor { height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="top">
+      <div>
+        <div class="title">CRONTABS</div>
+        <div class="subtitle">Snapshot + system crontab editor with diff and backups</div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="/ui/" target="_top">BACK TO DASHBOARD</a>
+        <a class="btn" href="/ui/settings.html">SETTINGS</a>
+        <button id="reload-users" class="btn" type="button">RELOAD USERS</button>
+        <button id="reload-content" class="btn" type="button">RELOAD CURRENT</button>
+        <button id="preview-diff" class="btn" type="button">PREVIEW DIFF</button>
+        <button id="save-snapshot" class="btn ok" type="button">SAVE SNAPSHOT</button>
+        <button id="save-system" class="btn warn" type="button">SAVE SYSTEM CRONTAB</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <aside class="left">
+        <div class="list-title">Crontab Users</div>
+        <div id="users" class="items"></div>
+      </aside>
+
+      <section class="right">
+        <div class="toolbar">
+          <label for="source-select" class="meta">Source:</label>
+          <select id="source-select">
+            <option value="snapshot">snapshot file</option>
+            <option value="system">system (crontab -l)</option>
+          </select>
+          <button id="save-both" class="btn" type="button">SAVE BOTH</button>
+        </div>
+        <div id="current-meta" class="meta">Choose user...</div>
+        <div class="editor"><div id="editor"></div></div>
+        <pre id="diff-preview" class="diff-box">Diff preview will appear here.</pre>
+        <div id="status" class="status muted">Ready.</div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.2/src-min-noconflict/ace.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.2/src-min-noconflict/ext-searchbox.js"></script>
+  <script>
+    const usersRoot = document.getElementById('users');
+    const sourceSelect = document.getElementById('source-select');
+    const currentMeta = document.getElementById('current-meta');
+    const statusEl = document.getElementById('status');
+    const diffPreviewEl = document.getElementById('diff-preview');
+    const reloadUsersBtn = document.getElementById('reload-users');
+    const reloadContentBtn = document.getElementById('reload-content');
+    const previewDiffBtn = document.getElementById('preview-diff');
+    const saveSnapshotBtn = document.getElementById('save-snapshot');
+    const saveSystemBtn = document.getElementById('save-system');
+    const saveBothBtn = document.getElementById('save-both');
+
+    let users = [];
+    let currentUser = '';
+    let editor = null;
+
+    function esc(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function setStatus(message, kind = 'muted') {
+      statusEl.className = `status ${kind}`;
+      statusEl.textContent = message;
+    }
+
+    function renderDiffPlainText(text) {
+      const lines = String(text || '').split('\n');
+      diffPreviewEl.innerHTML = lines.map((line) => {
+        const safe = esc(line || ' ');
+        if (line.startsWith('+') && !line.startsWith('+++')) return `<span class="add">${safe}</span>`;
+        if (line.startsWith('-') && !line.startsWith('---')) return `<span class="del">${safe}</span>`;
+        return safe;
+      }).join('\n');
+    }
+
+    function initEditor() {
+      editor = ace.edit('editor');
+      editor.setTheme('ace/theme/tomorrow_night_bright');
+      editor.session.setMode('ace/mode/sh');
+      editor.session.setUseSoftTabs(true);
+      editor.session.setTabSize(2);
+      editor.setShowPrintMargin(false);
+      editor.setOptions({
+        fontSize: '12px',
+        enableBasicAutocompletion: false,
+        enableLiveAutocompletion: false,
+        showLineNumbers: true,
+        showGutter: true,
+        wrap: true,
+      });
+      editor.setValue('', -1);
+      editor.focus();
+    }
+
+    function getEditorValue() {
+      return editor ? editor.getValue() : '';
+    }
+
+    function setEditorValue(value) {
+      if (!editor) return;
+      editor.setValue(String(value || ''), -1);
+      editor.clearSelection();
+    }
+
+    function renderUsers() {
+      if (!Array.isArray(users) || users.length === 0) {
+        usersRoot.innerHTML = '<div class="meta">No users available.</div>';
+        return;
+      }
+
+      usersRoot.innerHTML = users.map((item) => {
+        const active = item.user === currentUser ? 'active' : '';
+        const snap = item.snapshot_exists ? 'snapshot OK' : 'snapshot missing';
+        const cli = item.system_cli_available ? 'system CLI OK' : 'system CLI missing';
+        return `
+          <button class="user-item ${active}" type="button" data-user="${esc(item.user)}">
+            <div>${esc(item.label || item.user)}</div>
+            <div class="user-meta">${esc(snap)} | ${esc(cli)}</div>
+            <div class="user-meta">${esc(item.snapshot_path || '')}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    async function loadUsers() {
+      setStatus('Loading users list...', 'muted');
+      try {
+        const response = await fetch('/api/crontabs/list', { cache: 'no-store' });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Load users failed');
+        }
+        users = Array.isArray(payload.users) ? payload.users : [];
+        if (!currentUser && users.length > 0) currentUser = users[0].user;
+        renderUsers();
+        setStatus(`Loaded ${users.length} user(s).`, 'ok');
+        if (currentUser) await loadContent(currentUser);
+      } catch (error) {
+        setStatus(`Error: ${error && error.message ? error.message : String(error)}`, 'err');
+      }
+    }
+
+    async function loadContent(user) {
+      if (!user) return;
+      currentUser = user;
+      renderUsers();
+      setStatus('Loading crontab content...', 'muted');
+      const source = sourceSelect.value || 'snapshot';
+      try {
+        const url = `/api/crontabs/content?user=${encodeURIComponent(user)}&source=${encodeURIComponent(source)}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Load content failed');
+        }
+        const cmdInfo = payload.command ? ` | ${payload.command}` : '';
+        currentMeta.textContent = `${payload.user} | source: ${payload.source} | ${payload.snapshot_path}${cmdInfo}`;
+        setEditorValue(payload.content || '');
+        renderDiffPlainText('Diff preview will appear here.');
+        setStatus('Crontab loaded.', 'ok');
+      } catch (error) {
+        setStatus(`Error: ${error && error.message ? error.message : String(error)}`, 'err');
+      }
+    }
+
+    async function previewDiff() {
+      if (!currentUser) {
+        setStatus('Choose user first.', 'err');
+        return { changed: false };
+      }
+
+      const source = sourceSelect.value || 'snapshot';
+      setStatus(`Computing diff against ${source}...`, 'muted');
+      try {
+        const response = await fetch('/api/crontabs/diff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user: currentUser, source, content: getEditorValue() }),
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Diff failed');
+        }
+        renderDiffPlainText(payload.diff || 'No changes.');
+        setStatus(payload.changed ? 'Diff generated.' : 'No changes to save.', 'ok');
+        return { changed: Boolean(payload.changed), source };
+      } catch (error) {
+        setStatus(`Error: ${error && error.message ? error.message : String(error)}`, 'err');
+        return { changed: false };
+      }
+    }
+
+    async function saveCrontab(target) {
+      if (!currentUser) {
+        setStatus('Choose user first.', 'err');
+        return;
+      }
+
+      const diffInfo = await previewDiff();
+      if (!diffInfo.changed) return;
+
+      if (target === 'system' || target === 'both') {
+        const ok = confirm(`Confirm SAVE to system crontab for user ${currentUser}?`);
+        if (!ok) {
+          setStatus('Save canceled by user.', 'muted');
+          return;
+        }
+      }
+
+      setStatus(`Saving to ${target}...`, 'muted');
+      try {
+        const response = await fetch('/api/crontabs/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user: currentUser, content: getEditorValue(), target }),
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Save failed');
+        }
+        const backupParts = [];
+        if (payload.backups && payload.backups.snapshot) backupParts.push(`snapshot backup: ${payload.backups.snapshot}`);
+        if (payload.backups && payload.backups.system) backupParts.push(`system backup: ${payload.backups.system}`);
+        const backupInfo = backupParts.length > 0 ? ` | ${backupParts.join(' | ')}` : '';
+        setStatus(`Saved ${payload.user} -> ${payload.target}${backupInfo}`, 'ok');
+        await loadUsers();
+      } catch (error) {
+        setStatus(`Error: ${error && error.message ? error.message : String(error)}`, 'err');
+      }
+    }
+
+    usersRoot.addEventListener('click', (event) => {
+      const btn = event.target.closest('button[data-user]');
+      if (!btn) return;
+      const user = btn.getAttribute('data-user');
+      if (!user) return;
+      loadContent(user);
+    });
+
+    sourceSelect.addEventListener('change', () => loadContent(currentUser));
+    reloadUsersBtn.addEventListener('click', loadUsers);
+    reloadContentBtn.addEventListener('click', () => loadContent(currentUser));
+    previewDiffBtn.addEventListener('click', previewDiff);
+    saveSnapshotBtn.addEventListener('click', () => saveCrontab('snapshot'));
+    saveSystemBtn.addEventListener('click', () => saveCrontab('system'));
+    saveBothBtn.addEventListener('click', () => saveCrontab('both'));
+
+    initEditor();
+    loadUsers();
+  </script>
+</body>
+</html>

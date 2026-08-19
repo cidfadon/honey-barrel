@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>HB Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07090c;
+      --bg-2: #0d1117;
+      --bg-3: #11161d;
+      --border: #1f2630;
+      --text: #d7dde4;
+      --muted: #6a7480;
+      --amber: #ffb000;
+      --amber-2: #ffd57a;
+      --green: #00ff7f;
+      --red: #ff4d4d;
+    }
+    html, body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+      font-size: 13px;
+    }
+    .wrap {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .panel {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+    }
+    .panel-h {
+      background: var(--bg-3);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .title {
+      color: var(--amber);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .muted { color: var(--muted); }
+    .num { font-variant-numeric: tabular-nums; }
+
+    .summary-strip {
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: stretch;
+      overflow: hidden;
+    }
+    .cash-hero {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 3px;
+      padding: 5px 8px;
+      border: 1px solid rgba(255, 176, 0, 0.45);
+      background: linear-gradient(90deg, rgba(255, 176, 0, 0.10), rgba(255, 176, 0, 0.03));
+      box-shadow: inset 0 0 0 1px rgba(255, 176, 0, 0.06);
+      width: fit-content;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .cash-hero .label {
+      color: var(--amber-2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .cash-hero .value {
+      color: var(--amber);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 0 0 10px rgba(255, 176, 0, 0.36);
+      white-space: nowrap;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 4px;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .kpi {
+      border: 1px solid var(--border);
+      background: rgba(17, 22, 29, 0.58);
+      padding: 5px 6px;
+      min-width: 0;
+      min-height: 52px;
+      overflow: hidden;
+    }
+    .kpi .k {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .kpi .v {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--amber);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .v.up { color: var(--green); }
+    .v.down { color: var(--red); }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .ctrl {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      padding: 2px 5px;
+      font-size: 11px;
+    }
+    .ctrl input,
+    .ctrl select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 3px 6px;
+      font-family: inherit;
+      font-size: 11px;
+      min-height: 22px;
+    }
+    .ctrl input:focus,
+    .ctrl select:focus {
+      outline: none;
+      border-color: var(--amber);
+    }
+
+    .day-chip {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .day-chip.up {
+      border-color: #2f6b43;
+      color: #8fe3a4;
+    }
+    .day-chip.down {
+      border-color: #7f2a2a;
+      color: #ffb9b9;
+    }
+
+    .positions-table-wrap {
+      overflow-x: auto;
+      padding: 8px 10px 10px;
+    }
+    .positions-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .positions-table th {
+      text-align: left;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      font-size: 10px;
+    }
+    .positions-table td {
+      border-bottom: 1px solid #131820;
+      padding: 6px 6px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .positions-table tr:hover { background: #131a23; }
+    .positions-table .ticker {
+      color: var(--amber);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .value.up { color: var(--green); }
+    .value.down { color: var(--red); }
+
+    .trend-widget {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 168px;
+      transform-origin: right center;
+      transition: transform 150ms ease, filter 150ms ease;
+    }
+    .trend-cell {
+      position: relative;
+      overflow: visible;
+      min-width: 176px;
+      z-index: 1;
+    }
+    .trend-cell:hover {
+      z-index: 20;
+    }
+    .trend-cell:hover .trend-widget {
+      transform: scale(1.35);
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+    }
+    .trend-header {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+      min-width: 0;
+    }
+    .trend-header .label {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .trend-header select {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--amber-2);
+      font: inherit;
+      font-size: 11px;
+      padding: 3px 20px 3px 8px;
+      line-height: 1.1;
+      border-radius: 2px;
+      cursor: pointer;
+      max-width: 100%;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position:
+        calc(100% - 10px) 52%,
+        calc(100% - 6px) 52%;
+      background-size: 4px 4px, 4px 4px;
+      background-repeat: no-repeat;
+    }
+    .trend-header select:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 1px rgba(255, 176, 0, 0.12);
+    }
+    .trend-scale {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+      white-space: nowrap;
+    }
+    .trend-scale .current {
+      color: var(--amber-2);
+    }
+    .trend-chart {
+      border: 1px solid #1a212b;
+      background: linear-gradient(180deg, #0d1117 0%, #0b0f14 100%);
+      height: 38px;
+      width: 168px;
+      display: block;
+    }
+    .trend-chart .grid {
+      stroke: rgba(255, 255, 255, 0.09);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+    .trend-chart .grid.mid {
+      stroke: rgba(255, 255, 255, 0.14);
+    }
+    .trend-chart .area {
+      fill: rgba(255, 176, 0, 0.10);
+    }
+    .trend-chart path.line {
+      fill: none;
+      stroke-width: 1.7;
+      vector-effect: non-scaling-stroke;
+    }
+    .trend-chart path.reference {
+      fill: none;
+      stroke-width: 1.2;
+      stroke-dasharray: 3 2;
+      vector-effect: non-scaling-stroke;
+    }
+    .trend-chart path.reference.open {
+      stroke: rgba(159, 172, 186, 0.75);
+    }
+    .trend-chart path.reference.sma {
+      stroke: var(--amber-2);
+    }
+    .trend-chart path.up { stroke: var(--green); }
+    .trend-chart path.down { stroke: var(--red); }
+    .trend-chart path.flat { stroke: var(--muted); }
+    .trend-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .trend-foot .hint {
+      color: var(--amber-2);
+    }
+    .trend-foot .hint.up { color: var(--green); }
+    .trend-foot .hint.down { color: var(--red); }
+    .trend-foot .hint.flat { color: var(--muted); }
+    .trend-widget.empty {
+      border: 1px dashed #1a212b;
+      padding: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.3;
+      background: #0b0f14;
+      min-height: 38px;
+      justify-content: center;
+    }
+
+    .empty {
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .error {
+      color: var(--red);
+      border: 1px solid #622;
+      background: rgba(127, 42, 42, 0.12);
+      padding: 8px 10px;
+      margin: 10px;
+    }
+    .day-summary-body {
+      padding: 8px 10px;
+    }
+    .day-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .day-summary-item {
+      border: 1px solid var(--border);
+      background: rgba(17, 22, 29, 0.58);
+      padding: 6px 8px;
+      min-height: 50px;
+    }
+    .day-summary-item .k {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .day-summary-item .v {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .day-summary-item .v.up { color: var(--green); }
+    .day-summary-item .v.down { color: var(--red); }
+    .day-summary-item .v.neutral { color: var(--amber); }
+
+    .session-history-body {
+      padding: 8px 10px 10px;
+    }
+    .live-today-body {
+      padding: 8px 10px 10px;
+    }
+    .live-today-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+    .session-history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 6px;
+    }
+    .history-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      background: rgba(17, 22, 29, 0.58);
+    }
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .history-table th {
+      text-align: left;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      font-size: 10px;
+    }
+    .history-table td {
+      border-bottom: 1px solid #131820;
+      padding: 7px 8px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .history-table tr:last-child td {
+      border-bottom: 0;
+    }
+    .history-table .day {
+      color: var(--amber);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .history-table .strategy {
+      max-width: 420px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .trend-pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+    }
+    .trend-pill.up {
+      border-color: #2f6b43;
+      color: #8fe3a4;
+    }
+    .trend-pill.down {
+      border-color: #7f2a2a;
+      color: #ffb9b9;
+    }
+    .trend-pill.flat {
+      border-color: #3a4554;
+      color: #97a3af;
+    }
+    .session-card {
+      border: 1px solid var(--border);
+      background: rgba(17, 22, 29, 0.58);
+      padding: 7px 8px;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .session-card.live {
+      border-color: rgba(255, 176, 0, 0.45);
+      background: linear-gradient(90deg, rgba(255, 176, 0, 0.10), rgba(255, 176, 0, 0.03));
+    }
+    .session-card.live-wide {
+      min-height: 96px;
+    }
+    .session-card .topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .session-card .label {
+      color: var(--amber-2);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-size: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .session-card .date {
+      color: var(--muted);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+    .session-card .subtitle {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .session-card .details {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .session-card .detail {
+      border: 1px solid #131820;
+      background: #0b0f14;
+      padding: 5px 6px;
+      min-width: 0;
+    }
+    .session-card .detail .k {
+      font-size: 8px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .session-card .detail .v {
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .session-card .detail .v.up { color: var(--green); }
+    .session-card .detail .v.down { color: var(--red); }
+    .session-card .detail .v.neutral { color: var(--amber); }
+
+    @media (max-width: 1040px) {
+      .summary-strip {
+        grid-template-columns: 1fr;
+      }
+      .kpi-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .day-summary-grid {
+        grid-template-columns: 1fr;
+      }
+      .session-history-grid {
+        grid-template-columns: 1fr;
+      }
+      .trend-cell:hover .trend-widget {
+        transform: none;
+        filter: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="panel">
+      <div class="panel-h">
+        <span class="title">Portfolio // Alpaca Comparison</span>
+        <label class="ctrl" aria-label="Auto refresh interval control">
+          <span class="muted">AUTO REFRESH</span>
+          <select id="auto-refresh-interval">
+            <option value="5000">5s</option>
+            <option value="15000" selected>15s</option>
+            <option value="30000">30s</option>
+            <option value="60000">60s</option>
+            <option value="120000">2min</option>
+            <option value="300000">5min</option>
+            <option value="900000">15min</option>
+            <option value="1800000">30min</option>
+            <option value="3600000">1h</option>
+          </select>
+        </label>
+      </div>
+      <div class="summary-strip">
+        <div class="cash-hero">
+          <span class="label">Alpaca Cash</span>
+          <span class="value num" id="cash-hero">-</span>
+        </div>
+        <div class="kpi-strip" id="kpi-grid"></div>
+        <div class="muted" id="snapshot-meta">loading...</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h">
+        <span class="title">Live Today</span>
+      </div>
+      <div class="live-today-body" id="live-today-wrap">
+        <div class="muted">loading...</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h">
+        <span class="title">Open Positions</span>
+        <div class="toolbar">
+          <span class="muted" id="mode-pill">MODE: --</span>
+          <span class="day-chip" id="day-chip">DAY VS PREV CLOSE: --</span>
+          <label class="ctrl">
+            <span class="muted">FILTER</span>
+            <input type="text" id="positions-filter" placeholder="AAPL" maxlength="12" />
+          </label>
+          <label class="ctrl">
+            <span class="muted">SORT</span>
+            <select id="positions-sort">
+              <option value="pl_desc">P/L $ ↓</option>
+              <option value="pl_asc">P/L $ ↑</option>
+              <option value="plpc_desc">P/L % ↓</option>
+              <option value="plpc_asc">P/L % ↑</option>
+              <option value="value_desc">MKT VALUE ↓</option>
+              <option value="value_asc">MKT VALUE ↑</option>
+              <option value="ticker_asc">TICKER A→Z</option>
+              <option value="ticker_desc">TICKER Z→A</option>
+            </select>
+          </label>
+          <span class="muted" id="positions-count">0 positions</span>
+        </div>
+      </div>
+      <div id="positions-wrap"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h">
+        <span class="title">Historical Trends</span>
+        <span class="muted">live snapshot, refreshed with Live Today</span>
+      </div>
+      <div class="session-history-body" id="session-history-wrap">
+        <div class="muted">loading...</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const fmtMoney = (v) => Number.isFinite(Number(v)) ? '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-';
+    const fmtPct = (v) => Number.isFinite(Number(v)) ? (Number(v) * 100).toFixed(2) + '%' : '-';
+    const fmtQty = (v) => Number.isFinite(Number(v)) ? Number(v).toFixed(4).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1') : '-';
+    const cssEsc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+
+    const HISTORY_LIMIT = 32;
+    const HISTORICAL_DAYS = 5;
+    const PORTFOLIO_CACHE_KEY = 'portfolio.snapshot.v1';
+    const PORTFOLIO_CACHE_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+    const AUTO_REFRESH_INTERVAL_KEY = 'portfolio.autoRefreshIntervalMs';
+    const DEFAULT_AUTO_REFRESH_INTERVAL_MS = 15000;
+    let timer = null;
+    let lastPayload = null;
+    const priceHistory = new Map();
+    const TREND_MODE_KEY = 'portfolio.trendMode';
+    let trendMode = localStorage.getItem(TREND_MODE_KEY) || 'price';
+
+    function setTrendMode(value) {
+      const next = ['price', 'relative', 'normalized', 'open', 'sma'].includes(value) ? value : 'price';
+      trendMode = next;
+      localStorage.setItem(TREND_MODE_KEY, next);
+      const select = document.getElementById('trend-mode');
+      if (select && select.value !== next) {
+        select.value = next;
+      }
+      rerenderPositionsOnly();
+    }
+
+    function kpiClass(value) {
+      if (!Number.isFinite(Number(value))) return '';
+      if (Number(value) > 0) return 'up';
+      if (Number(value) < 0) return 'down';
+      return '';
+    }
+
+    function numeric(value, fallback = null) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function setDayChip(metrics) {
+      const chip = document.getElementById('day-chip');
+      if (!chip) return;
+      chip.classList.remove('up', 'down');
+
+      const deltaUsd = numeric(metrics && metrics.day_equity_change);
+      const deltaPct = numeric(metrics && metrics.day_equity_change_pct);
+      if (deltaUsd == null || deltaPct == null) {
+        chip.textContent = 'DAY VS PREV CLOSE: --';
+        return;
+      }
+
+      if (deltaUsd > 0) chip.classList.add('up');
+      if (deltaUsd < 0) chip.classList.add('down');
+      const sign = deltaUsd > 0 ? '+' : '';
+      const signPct = deltaPct > 0 ? '+' : '';
+      chip.textContent = 'DAY VS PREV CLOSE: ' + sign + fmtMoney(deltaUsd) + ' (' + signPct + fmtPct(deltaPct) + ')';
+    }
+
+    function serializePriceHistory() {
+      const out = {};
+      for (const [symbol, history] of priceHistory.entries()) {
+        if (!Array.isArray(history) || history.length === 0) continue;
+        out[symbol] = history.slice(-HISTORY_LIMIT);
+      }
+      return out;
+    }
+
+    function hydratePriceHistory(rawMap) {
+      priceHistory.clear();
+      if (!rawMap || typeof rawMap !== 'object') return;
+      Object.entries(rawMap).forEach(([symbol, values]) => {
+        if (!Array.isArray(values)) return;
+        const cleaned = values
+          .map((v) => Number(v))
+          .filter((v) => Number.isFinite(v))
+          .slice(-HISTORY_LIMIT);
+        if (cleaned.length > 0) {
+          priceHistory.set(String(symbol).toUpperCase(), cleaned);
+        }
+      });
+    }
+
+    function seedPriceHistoryFromPayload(payload) {
+      const rawMap = payload && payload.trend_history;
+      if (!rawMap || typeof rawMap !== 'object') return;
+
+      Object.entries(rawMap).forEach(([symbol, values]) => {
+        if (!Array.isArray(values)) return;
+        const key = String(symbol || '').toUpperCase();
+        if (!key) return;
+
+        const cleaned = values
+          .map((v) => Number(v))
+          .filter((v) => Number.isFinite(v))
+          .slice(-HISTORY_LIMIT);
+
+        if (!cleaned.length) return;
+
+        // Always preserve trend_history from backend — it shows historical bars
+        // regardless of whether market is open or current price is updating
+        const existing = priceHistory.get(key) || [];
+        const existingHasLiveUpdates = existing.length > cleaned.length;
+        
+        if (!existingHasLiveUpdates || cleaned.length > 0) {
+          // Use backend trend data if we don't have live updates, or merge
+          priceHistory.set(key, cleaned);
+        }
+      });
+    }
+
+    function savePortfolioCache(payload) {
+      try {
+        const snapshot = {
+          savedAt: Date.now(),
+          payload,
+          trendMode,
+          priceHistory: serializePriceHistory(),
+        };
+        localStorage.setItem(PORTFOLIO_CACHE_KEY, JSON.stringify(snapshot));
+      } catch (_e) {
+        // Ignore localStorage quota or serialization errors.
+      }
+    }
+
+    function loadPortfolioCache() {
+      try {
+        const raw = localStorage.getItem(PORTFOLIO_CACHE_KEY);
+        if (!raw) return null;
+
+        const snapshot = JSON.parse(raw);
+        if (!snapshot || typeof snapshot !== 'object') return null;
+
+        const savedAt = Number(snapshot.savedAt);
+        if (!Number.isFinite(savedAt) || (Date.now() - savedAt) > PORTFOLIO_CACHE_MAX_AGE_MS) {
+          return null;
+        }
+
+        if (typeof snapshot.trendMode === 'string') {
+          trendMode = snapshot.trendMode;
+        }
+
+        hydratePriceHistory(snapshot.priceHistory);
+        return snapshot.payload && typeof snapshot.payload === 'object' ? snapshot.payload : null;
+      } catch (_e) {
+        return null;
+      }
+    }
+
+    function renderPortfolioSnapshot(payload) {
+      const meta = document.getElementById('snapshot-meta');
+      const modePill = document.getElementById('mode-pill');
+      const cashHero = document.getElementById('cash-hero');
+
+      const ts = Number(payload.timestamp);
+      const now = Number.isFinite(ts) ? new Date(ts * 1000) : new Date();
+      if (meta) meta.textContent = 'LAST UPDATE: ' + now.toLocaleTimeString('en-US');
+      if (modePill) modePill.textContent = 'MODE: ' + String((payload.mode || '--')).toUpperCase();
+
+      const cash = payload.account && Number(payload.account.cash);
+      if (cashHero) cashHero.textContent = Number.isFinite(cash) ? fmtMoney(cash) : '-';
+
+      const allPositions = Array.isArray(payload.positions) ? payload.positions : [];
+      seedPriceHistoryFromPayload(payload);
+      updatePriceHistory(allPositions);
+      setDayChip(payload.metrics || {});
+
+      lastPayload = payload;
+      renderKpis(payload);
+      renderPositions(payload);
+      renderLiveToday(payload);
+      renderSessionHistory(payload);
+    }
+
+    function updatePriceHistory(positions) {
+      const seen = new Set();
+      positions.forEach((p) => {
+        const symbol = String((p && p.symbol) || '').toUpperCase();
+        if (!symbol) return;
+        seen.add(symbol);
+        
+        const px = numeric(
+          p.current_price,
+          numeric(
+            p.sell_price,
+            numeric(
+              p.buy_price,
+              numeric(p.avg_entry_price)
+            )
+          )
+        );
+        
+        // Only add new tick if we have a valid price
+        // If market is closed or no current price, preserve existing trend data
+        if (px == null) return;
+
+        const history = priceHistory.get(symbol) || [];
+        const last = history.length ? history[history.length - 1] : null;
+        if (last == null || Math.abs(last - px) > 1e-8) {
+          history.push(px);
+          if (history.length > HISTORY_LIMIT) history.shift();
+          priceHistory.set(symbol, history);
+        }
+      });
+
+      // Only remove symbols that are no longer in positions
+      // Keep trend data for all positions, even if their current price is unavailable
+      Array.from(priceHistory.keys()).forEach((symbol) => {
+        if (!seen.has(symbol)) priceHistory.delete(symbol);
+      });
+    }
+
+    function chartPoints(values, width, height, leftPad, rightPad, topPad, bottomPad, scaleValues) {
+      const min = Math.min(...scaleValues);
+      const max = Math.max(...scaleValues);
+      const range = Math.max(1e-9, max - min);
+      const innerWidth = width - leftPad - rightPad;
+      const innerHeight = height - topPad - bottomPad;
+      return values.map((v, idx) => {
+        const x = values.length <= 1 ? leftPad : leftPad + (idx * innerWidth) / (values.length - 1);
+        const y = height - bottomPad - ((v - min) / range) * innerHeight;
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      }).join(' ');
+    }
+
+    function formatTrendPct(value) {
+      const sign = value > 0 ? '+' : '';
+      return sign + value.toFixed(2) + '%';
+    }
+
+    function buildSparkline(symbol) {
+      const rawValues = priceHistory.get(symbol) || [];
+      if (!rawValues.length) {
+        return '<div class="trend-widget empty">'
+          + '<span>no trend data yet</span>'
+          + '<span>waiting for quote ticks</span>'
+          + '</div>';
+      }
+
+      const values = rawValues.length === 1
+        ? [rawValues[0], rawValues[0]]
+        : rawValues;
+
+      const width = 168;
+      const height = 38;
+      const first = values[0];
+      const last = values[values.length - 1];
+      const trendClass = last > first ? 'up' : last < first ? 'down' : 'flat';
+
+      const leftPad = 3;
+      const rightPad = 3;
+      const topPad = 3;
+      const bottomPad = 3;
+      const relativeValues = values.map((v) => first !== 0 ? ((v - first) / first) * 100 : 0);
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      const normalizedValues = values.length <= 1
+        ? values.map(() => 50)
+        : values.map((v) => ((v - minValue) / Math.max(1e-9, maxValue - minValue)) * 100);
+      const smaValues = values.map((_, idx) => {
+        const start = Math.max(0, idx - 4);
+        const slice = values.slice(start, idx + 1);
+        return slice.reduce((sum, item) => sum + item, 0) / slice.length;
+      });
+
+      let scaleLabelA = '';
+      let scaleLabelB = '';
+      let scaleLabelC = '';
+      let footLabel = '';
+      let scaleValues = values;
+      let chartValues = values;
+      let referenceValues = null;
+      let referenceClass = '';
+      let changePct = first !== 0 ? ((last - first) / first) * 100 : 0;
+
+      if (trendMode === 'relative') {
+        chartValues = relativeValues;
+        scaleValues = relativeValues;
+        scaleLabelA = formatTrendPct(Math.min(...relativeValues));
+        scaleLabelB = 'NOW ' + formatTrendPct(relativeValues[relativeValues.length - 1] || 0);
+        scaleLabelC = formatTrendPct(Math.max(...relativeValues));
+        footLabel = 'vs first';
+      } else if (trendMode === 'normalized') {
+        chartValues = normalizedValues;
+        scaleValues = normalizedValues;
+        scaleLabelA = '0';
+        scaleLabelB = 'NOW ' + normalizedValues[normalizedValues.length - 1].toFixed(0);
+        scaleLabelC = '100';
+        footLabel = '0-100';
+        changePct = first !== 0 ? ((last - first) / first) * 100 : 0;
+      } else if (trendMode === 'open') {
+        chartValues = values;
+        scaleValues = values;
+        scaleLabelA = minValue.toFixed(2);
+        scaleLabelB = 'NOW ' + last.toFixed(2);
+        scaleLabelC = maxValue.toFixed(2);
+        footLabel = 'open ref';
+        referenceValues = values.map(() => first);
+        referenceClass = 'open';
+      } else if (trendMode === 'sma') {
+        chartValues = values;
+        scaleValues = values;
+        scaleLabelA = minValue.toFixed(2);
+        scaleLabelB = 'NOW ' + last.toFixed(2);
+        scaleLabelC = maxValue.toFixed(2);
+        footLabel = 'sma 5';
+        referenceValues = smaValues;
+        referenceClass = 'sma';
+      } else {
+        scaleLabelA = minValue.toFixed(2);
+        scaleLabelB = 'NOW ' + last.toFixed(2);
+        scaleLabelC = maxValue.toFixed(2);
+        footLabel = 'price';
+      }
+
+      const midY = (topPad + (height - topPad - bottomPad) / 2).toFixed(1);
+      const points = chartPoints(chartValues, width, height, leftPad, rightPad, topPad, bottomPad, scaleValues);
+      const referencePoints = referenceValues ? chartPoints(referenceValues, width, height, leftPad, rightPad, topPad, bottomPad, scaleValues) : '';
+      const innerWidth = width - leftPad - rightPad;
+      const areaPoints = 'M ' + leftPad.toFixed(1) + ',' + (height - bottomPad).toFixed(1)
+        + ' ' + points
+        + ' L ' + (leftPad + innerWidth).toFixed(1) + ',' + (height - bottomPad).toFixed(1)
+        + ' Z';
+      const changeClass = changePct > 0 ? 'up' : changePct < 0 ? 'down' : 'flat';
+      const changeSign = changePct > 0 ? '+' : '';
+
+      return '<div class="trend-widget">'
+        + '<div class="trend-scale">'
+        + '<span>' + cssEsc(scaleLabelA) + '</span>'
+        + '<span class="current">' + cssEsc(scaleLabelB) + '</span>'
+        + '<span>' + cssEsc(scaleLabelC) + '</span>'
+        + '</div>'
+        + '<svg class="trend-chart" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" aria-hidden="true">'
+        + '<line class="grid" x1="' + leftPad + '" y1="' + topPad + '" x2="' + (width - rightPad) + '" y2="' + topPad + '"></line>'
+        + '<line class="grid mid" x1="' + leftPad + '" y1="' + midY + '" x2="' + (width - rightPad) + '" y2="' + midY + '"></line>'
+        + '<line class="grid" x1="' + leftPad + '" y1="' + (height - bottomPad) + '" x2="' + (width - rightPad) + '" y2="' + (height - bottomPad) + '"></line>'
+        + '<path class="area" d="' + areaPoints + '"></path>'
+        + (referenceValues ? '<path class="reference ' + referenceClass + '" d="M ' + referencePoints + '"></path>' : '')
+        + '<path class="line ' + trendClass + '" d="M ' + points + '"></path>'
+        + '</svg>'
+        + '<div class="trend-foot">'
+        + '<span>' + cssEsc(rawValues.length) + ' pts</span>'
+        + '<span class="hint ' + changeClass + '">' + cssEsc(changeSign + changePct.toFixed(2) + '%') + '</span>'
+        + '<span>' + cssEsc(footLabel) + '</span>'
+        + '</div>'
+        + '</div>';
+    }
+
+    function sortedFilteredPositions(payload) {
+      const positions = Array.isArray(payload && payload.positions) ? payload.positions.slice() : [];
+      const filterEl = document.getElementById('positions-filter');
+      const sortEl = document.getElementById('positions-sort');
+      const filter = String((filterEl && filterEl.value) || '').trim().toUpperCase();
+      const sortBy = String((sortEl && sortEl.value) || 'pl_desc');
+
+      const filtered = filter
+        ? positions.filter((p) => String((p && p.symbol) || '').toUpperCase().includes(filter))
+        : positions;
+
+      const cmpNum = (a, b, key, dir = 'desc') => {
+        const av = numeric(a && a[key], dir === 'desc' ? -Infinity : Infinity);
+        const bv = numeric(b && b[key], dir === 'desc' ? -Infinity : Infinity);
+        return dir === 'desc' ? (bv - av) : (av - bv);
+      };
+
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'pl_asc': return cmpNum(a, b, 'unrealized_pl', 'asc');
+          case 'plpc_desc': return cmpNum(a, b, 'unrealized_plpc', 'desc');
+          case 'plpc_asc': return cmpNum(a, b, 'unrealized_plpc', 'asc');
+          case 'value_desc': return cmpNum(a, b, 'market_value', 'desc');
+          case 'value_asc': return cmpNum(a, b, 'market_value', 'asc');
+          case 'ticker_asc': return String((a && a.symbol) || '').localeCompare(String((b && b.symbol) || ''));
+          case 'ticker_desc': return String((b && b.symbol) || '').localeCompare(String((a && a.symbol) || ''));
+          case 'pl_desc':
+          default:
+            return cmpNum(a, b, 'unrealized_pl', 'desc');
+        }
+      });
+
+      return filtered;
+    }
+
+    function renderKpis(payload) {
+      const account = payload.account || {};
+      const metrics = payload.metrics || {};
+      const list = [
+        { k: 'Equity', v: fmtMoney(account.equity), cls: '' },
+        { k: 'Equity Δ 1D', v: fmtMoney(metrics.day_equity_change), cls: kpiClass(metrics.day_equity_change) },
+        { k: 'Equity Δ 1D %', v: fmtPct(metrics.day_equity_change_pct), cls: kpiClass(metrics.day_equity_change_pct) },
+        { k: 'Portfolio Value', v: fmtMoney(account.portfolio_value), cls: '' },
+        { k: 'Buying Power', v: fmtMoney(account.buying_power), cls: '' },
+        { k: 'Open Positions', v: String(metrics.open_positions ?? 0), cls: '' }
+      ];
+
+      const grid = document.getElementById('kpi-grid');
+      if (!grid) return;
+      grid.innerHTML = list.map((item) => {
+        const cls = item.cls ? ' ' + item.cls : '';
+        return '<article class="kpi">'
+          + '<div class="k">' + cssEsc(item.k) + '</div>'
+          + '<div class="v num' + cls + '">' + cssEsc(item.v) + '</div>'
+          + '</article>';
+      }).join('');
+    }
+
+    function renderPositions(payload) {
+      const wrap = document.getElementById('positions-wrap');
+      const positions = sortedFilteredPositions(payload);
+      const count = document.getElementById('positions-count');
+      if (count) count.textContent = String(positions.length) + ' positions';
+
+      if (!wrap) return;
+      if (!positions.length) {
+        wrap.innerHTML = '<div class="empty">No open Alpaca positions.</div>';
+        return;
+      }
+
+      const rows = positions.map((p) => {
+        return '<tr>'
+          + '<td class="ticker">' + cssEsc(p.symbol || '-') + '</td>'
+          + '<td class="num">' + cssEsc(fmtQty(p.qty)) + '</td>'
+          + '<td class="num">' + cssEsc(fmtMoney(p.buy_price)) + '</td>'
+          + '<td class="num">' + cssEsc(fmtMoney(p.sell_price)) + '</td>'
+          + '<td class="num">' + cssEsc(fmtMoney(p.avg_entry_price)) + '</td>'
+          + '<td class="num">' + cssEsc(fmtMoney(p.current_price)) + '</td>'
+          + '<td class="num">' + cssEsc(fmtMoney(p.cost_basis)) + '</td>'
+          + '<td class="num">' + cssEsc(fmtMoney(p.market_value)) + '</td>'
+          + '<td class="num value ' + kpiClass(p.unrealized_intraday_pl) + '">' + cssEsc(fmtMoney(p.unrealized_intraday_pl)) + ' / ' + cssEsc(fmtPct(p.unrealized_intraday_plpc)) + '</td>'
+            + '<td class="trend-cell">' + buildSparkline(String(p.symbol || '')) + '</td>'
+          + '</tr>';
+      }).join('');
+
+      wrap.innerHTML = '<div class="positions-table-wrap">'
+        + '<table class="positions-table">'
+        + '<thead><tr>'
+        + '<th>Ticker</th>'
+        + '<th>Qty</th>'
+        + '<th>Buy</th>'
+        + '<th>Sell</th>'
+        + '<th>Avg Entry</th>'
+        + '<th>Current</th>'
+        + '<th>Cost Basis</th>'
+        + '<th>Mkt Value</th>'
+        + '<th>Intra P/L</th>'
+          + '<th><div class="trend-header"><span class="label">TRENDS</span><select id="trend-mode" aria-label="Trend display mode"><option value="price">Price</option><option value="relative">Relative %</option><option value="normalized">Normalized</option><option value="open">Open ref</option><option value="sma">SMA</option></select></div></th>'
+        + '</tr></thead>'
+        + '<tbody>' + rows + '</tbody>'
+        + '</table>'
+        + '</div>';
+
+      const trendSelect = document.getElementById('trend-mode');
+      if (trendSelect) {
+        trendSelect.value = trendMode;
+        trendSelect.onchange = (event) => setTrendMode(event.target.value);
+      }
+    }
+
+    function getFinancialStrategyText(payload) {
+      const strategy = payload && payload.financial_strategy ? payload.financial_strategy : {};
+      const selected = String(strategy.selected || '').trim();
+      const strategyEnabled = Boolean(strategy.enabled);
+      return (strategyEnabled && selected) ? selected : 'default (Prompt only)';
+    }
+
+    function strategyFileNameOnly(value) {
+      const text = String(value || '').trim();
+      if (!text) return '';
+      const first = text.split(',')[0].trim();
+      if (!first) return '';
+      const normalized = first.replace(/\\/g, '/');
+      const parts = normalized.split('/').filter(Boolean);
+      return parts.length ? parts[parts.length - 1] : first;
+    }
+
+    function getItemFinancialStrategyText(item) {
+      return strategyFileNameOnly(item && item.financial_strategy);
+    }
+
+    function parseSessionDateUtc(item) {
+      const dateText = String(item && item.date || '').trim();
+      if (dateText) {
+        const d = new Date(dateText + 'T00:00:00Z');
+        if (!Number.isNaN(d.getTime())) return d;
+      }
+
+      const submitted = String(item && item.submitted_at || '').trim();
+      if (submitted) {
+        const d = new Date(submitted);
+        if (!Number.isNaN(d.getTime())) {
+          return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+        }
+      }
+      return null;
+    }
+
+    function fallbackNotionalFromHistory(payload, side) {
+      const normalizedSide = String(side || '').trim().toLowerCase();
+      if (!['buy', 'sell'].includes(normalizedSide)) return 0;
+      const history = Array.isArray(payload && payload.session_history) ? payload.session_history : [];
+      const today = new Date();
+      const todayKey = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())).toISOString().slice(0, 10);
+      let total = 0;
+
+      history.forEach((item) => {
+        if (String(item && item.kind || '').toLowerCase() !== 'report') return;
+        const date = parseSessionDateUtc(item);
+        if (!date) return;
+        if (date.toISOString().slice(0, 10) !== todayKey) return;
+        const action = String(item && item.action || '').trim().toLowerCase();
+        if (action !== normalizedSide) return;
+        const notional = numeric(item && item.notional);
+        if (!Number.isFinite(notional)) return;
+        total += Math.abs(Number(notional));
+      });
+
+      return total;
+    }
+
+    function isWithinRecentDays(item, days) {
+      const d = parseSessionDateUtc(item);
+      if (!d) return false;
+      const todayUtc = new Date();
+      const todayStart = Date.UTC(todayUtc.getUTCFullYear(), todayUtc.getUTCMonth(), todayUtc.getUTCDate());
+      const cutoff = todayStart - ((Math.max(1, Number(days) || 1) - 1) * 24 * 60 * 60 * 1000);
+      return d.getTime() >= cutoff;
+    }
+
+    function buildSessionCard(item, options = {}) {
+      const forceLive = options && options.forceLive === true;
+      const financialStrategy = options && options.financialStrategy
+        ? String(options.financialStrategy).trim()
+        : '';
+      const kind = String(item && item.kind || '').toLowerCase();
+      const isLive = forceLive || kind === 'live';
+      const buy = numeric(item && (item.buy_notional ?? item.buy_notional_today ?? item.notional));
+      const sell = numeric(item && (item.sell_notional ?? item.sell_notional_today));
+      const net = numeric(item && item.net_notional);
+      const label = String(item && item.label || (isLive ? 'Live today' : 'Report session'));
+      const date = String(item && item.date || '');
+      const subtitleParts = [item && item.symbol, item && item.action, item && item.status]
+        .map((value) => String(value || '').trim())
+        .filter(Boolean);
+      const subtitle = subtitleParts.length ? subtitleParts.join(' · ') : '-';
+      const source = String((item && (item.source || item.buy_notional_source || item.sell_notional_source)) || '');
+      const netClass = Number.isFinite(net) && net > 0 ? 'up' : (Number.isFinite(net) && net < 0 ? 'down' : 'neutral');
+      const buyClass = Number.isFinite(buy) && buy > 0 ? 'up' : 'neutral';
+      const sellClass = Number.isFinite(sell) && sell > 0 ? 'down' : 'neutral';
+      const cardClass = 'session-card' + (isLive ? ' live live-wide' : '');
+
+      return '<article class="' + cardClass + '">'
+        + '<div class="topline">'
+        + '<div class="label">' + cssEsc(label) + '</div>'
+        + '<div class="date">' + cssEsc(date || '-') + '</div>'
+        + '</div>'
+        + '<div class="subtitle">' + cssEsc(subtitle) + '</div>'
+        + '<div class="details">'
+        + '<div class="detail"><div class="k">Buy</div><div class="v ' + buyClass + '">' + cssEsc(fmtMoney(buy)) + '</div></div>'
+        + '<div class="detail"><div class="k">Sell</div><div class="v ' + sellClass + '">' + cssEsc(fmtMoney(sell)) + '</div></div>'
+        + '<div class="detail"><div class="k">Net</div><div class="v ' + netClass + '">' + cssEsc(fmtMoney(net)) + '</div></div>'
+        + '</div>'
+        + (financialStrategy
+          ? '<div class="muted" style="font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Financial Strategy (Prompt Engineering): ' + cssEsc(financialStrategy) + '</div>'
+          : '')
+        + '<div class="muted" style="font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">source: ' + cssEsc(source || 'reports') + '</div>'
+        + '</article>';
+    }
+
+    function renderLiveToday(payload) {
+      const wrap = document.getElementById('live-today-wrap');
+      if (!wrap) return;
+
+      const history = Array.isArray(payload.session_history) ? payload.session_history : [];
+      const liveItem = history.find((item) => String(item && item.kind || '').toLowerCase() === 'live');
+      if (!liveItem) {
+        wrap.innerHTML = '<div class="empty">No live session snapshot available.</div>';
+        return;
+      }
+
+      const daySummary = payload.day_summary || {};
+      const buyToday = numeric(daySummary.buy_notional_today);
+      const sellToday = numeric(daySummary.sell_notional_today);
+      const liveBuy = numeric(liveItem.buy_notional ?? liveItem.buy_notional_today, buyToday);
+      const liveSell = numeric(liveItem.sell_notional ?? liveItem.sell_notional_today, sellToday);
+      const normalizedLive = {
+        ...liveItem,
+        date: Number.isFinite(Number(payload && payload.timestamp))
+          ? new Date(Number(payload.timestamp) * 1000).toLocaleTimeString('en-US')
+          : String(liveItem.date || '-'),
+        buy_notional: liveBuy,
+        sell_notional: liveSell,
+        net_notional: liveSell - liveBuy,
+      };
+
+      const strategyText = getFinancialStrategyText(payload);
+      wrap.innerHTML = '<div class="live-today-grid">'
+        + buildSessionCard(normalizedLive, { forceLive: true, financialStrategy: strategyText })
+        + '</div>';
+    }
+
+    function parseSessionSubmittedAtMs(item) {
+      const raw = item && item.submitted_at;
+      if (typeof raw === 'number' && Number.isFinite(raw)) {
+        return raw > 1e12 ? raw : raw * 1000;
+      }
+      if (typeof raw === 'string' && raw.trim()) {
+        const n = Number(raw);
+        if (Number.isFinite(n)) return n > 1e12 ? n : n * 1000;
+        const parsed = Date.parse(raw);
+        if (!Number.isNaN(parsed)) return parsed;
+      }
+      const date = parseSessionDateUtc(item);
+      return date ? date.getTime() : 0;
+    }
+
+    function aggregateHistoricalTrends(history) {
+      const byDate = new Map();
+      const today = new Date();
+      const dayKeys = Array.from({ length: HISTORICAL_DAYS }, (_, idx) => {
+        const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - (idx + 1)));
+        return d.toISOString().slice(0, 10);
+      });
+
+      dayKeys.forEach((key) => {
+        byDate.set(key, {
+          date: key,
+          buy: 0,
+          sell: 0,
+          trades: 0,
+          buy_components: 0,
+          sell_components: 0,
+          strategy: '',
+          strategy_updated_at: 0,
+        });
+      });
+
+      history.forEach((item) => {
+        if (String(item && item.kind || '').toLowerCase() !== 'report') return;
+        const date = parseSessionDateUtc(item);
+        if (!date) return;
+        const dateKey = date.toISOString().slice(0, 10);
+        if (!byDate.has(dateKey)) return;
+        const bucket = byDate.get(dateKey);
+        const strategyText = getItemFinancialStrategyText(item);
+        const submittedMs = parseSessionSubmittedAtMs(item);
+        if (strategyText && submittedMs >= bucket.strategy_updated_at) {
+          bucket.strategy = strategyText;
+          bucket.strategy_updated_at = submittedMs;
+        }
+
+        const action = String(item && item.action || '').trim().toLowerCase();
+        const notional = numeric(item && item.notional);
+        if (!Number.isFinite(notional) || !['buy', 'sell'].includes(action)) return;
+
+        const amount = Math.abs(Number(notional));
+        if (action === 'buy') {
+          bucket.buy += amount;
+          bucket.buy_components += 1;
+        }
+        if (action === 'sell') {
+          bucket.sell += amount;
+          bucket.sell_components += 1;
+        }
+        bucket.trades += 1;
+      });
+
+      return dayKeys.map((dayKey, idx) => {
+        const bucket = byDate.get(dayKey) || {
+          date: dayKey,
+          buy: 0,
+          sell: 0,
+          trades: 0,
+          buy_components: 0,
+          sell_components: 0,
+        };
+        const net = bucket.sell - bucket.buy;
+        const trend = net > 0 ? 'UP' : (net < 0 ? 'DOWN' : 'FLAT');
+        const bias = bucket.buy > bucket.sell ? 'BUY BIAS' : (bucket.sell > bucket.buy ? 'SELL BIAS' : 'FLAT');
+        const relativeLabel = idx === 0 ? 'Yesterday' : (idx === 1 ? 'Ereyesterday' : `${idx + 1} days ago`);
+        const isImprecise = bucket.buy_components > bucket.sell_components;
+        return {
+          dayLabel: `DAY${idx + 1}`,
+          relativeLabel,
+          date: bucket.date,
+          buy_notional: bucket.buy,
+          sell_notional: bucket.sell,
+          net_notional: net,
+          net_imprecise: isImprecise,
+          trend,
+          bias,
+          strategy: bucket.strategy || '',
+          trades: bucket.trades,
+          buy_components: bucket.buy_components,
+          sell_components: bucket.sell_components,
+        };
+      });
+    }
+
+    function renderSessionHistory(payload) {
+      const wrap = document.getElementById('session-history-wrap');
+      if (!wrap) return;
+
+      const history = Array.isArray(payload.session_history) ? payload.session_history : [];
+      const daySummary = payload.day_summary || {};
+      const liveItem = history.find((item) => String(item && item.kind || '').toLowerCase() === 'live') || {};
+      const reportHistory = history.filter((item) => String(item && item.kind || '').toLowerCase() === 'report');
+      const aggregated = aggregateHistoricalTrends(reportHistory);
+      const buy = numeric(liveItem.buy_notional ?? liveItem.buy_notional_today, numeric(daySummary.buy_notional_today, 0));
+      const sell = numeric(liveItem.sell_notional ?? liveItem.sell_notional_today, numeric(daySummary.sell_notional_today, 0));
+      const net = Number.isFinite(buy) && Number.isFinite(sell) ? (sell - buy) : 0;
+      const trend = net > 0 ? 'UP' : (net < 0 ? 'DOWN' : 'FLAT');
+      const bias = buy > sell ? 'BUY BIAS' : (sell > buy ? 'SELL BIAS' : 'FLAT');
+      const snapshotDate = String(liveItem.date || new Date().toISOString().slice(0, 10));
+      const source = String(liveItem.source || daySummary.sell_notional_source || daySummary.buy_notional_source || 'guardrails');
+      const strategyFromLiveConfig = strategyFileNameOnly(payload && payload.financial_strategy && payload.financial_strategy.selected);
+      const strategyText = getItemFinancialStrategyText(
+        reportHistory
+          .filter((item) => String(item && item.date || '') === snapshotDate)
+          .sort((a, b) => parseSessionSubmittedAtMs(b) - parseSessionSubmittedAtMs(a))[0]
+      ) || strategyFromLiveConfig || 'n/a (no report session yet)';
+      const netClass = net > 0 ? 'up' : (net < 0 ? 'down' : 'neutral');
+      const buyClass = buy > 0 ? 'up' : 'neutral';
+      const sellClass = sell > 0 ? 'down' : 'neutral';
+      const trendClass = trend.toLowerCase();
+      let rows = '<tr>'
+        + '<td class="day">Snapshot <span class="muted">(' + cssEsc(snapshotDate) + ')</span></td>'
+        + '<td class="num ' + buyClass + '">' + cssEsc(fmtMoney(buy)) + '</td>'
+        + '<td class="num ' + sellClass + '">' + cssEsc(fmtMoney(sell)) + '</td>'
+        + '<td class="num ' + netClass + '">' + cssEsc(fmtMoney(net)) + '</td>'
+        + '<td><span class="trend-pill ' + cssEsc(trendClass) + '">' + cssEsc(trend + ' / ' + bias) + '</span></td>'
+        + '<td class="strategy">' + cssEsc(strategyText) + '</td>'
+        + '</tr>';
+
+      aggregated.forEach((item) => {
+        const dayNetClass = item.net_notional > 0 ? 'up' : (item.net_notional < 0 ? 'down' : 'neutral');
+        const dayBuyClass = item.buy_notional > 0 ? 'up' : 'neutral';
+        const daySellClass = item.sell_notional > 0 ? 'down' : 'neutral';
+        const dayTrendClass = String(item.trend || 'flat').toLowerCase();
+        const dayLabel = String(item.dayLabel || 'DAY') + ' · ' + String(item.relativeLabel || item.date || '');
+        rows += '<tr>'
+          + '<td class="day">' + cssEsc(dayLabel) + ' <span class="muted">(' + cssEsc(item.date || '-') + ')</span></td>'
+          + '<td class="num ' + dayBuyClass + '">' + cssEsc(fmtMoney(item.buy_notional)) + '</td>'
+          + '<td class="num ' + daySellClass + '">' + cssEsc(fmtMoney(item.sell_notional)) + '</td>'
+          + '<td class="num ' + dayNetClass + '">' + cssEsc(fmtMoney(item.net_notional)) + '</td>'
+          + '<td><span class="trend-pill ' + cssEsc(dayTrendClass) + '">' + cssEsc(String(item.trend || 'FLAT') + ' / ' + String(item.bias || 'FLAT')) + '</span></td>'
+          + '<td class="strategy">' + cssEsc(item.strategy || 'n/a (no report session)') + '</td>'
+          + '</tr>';
+      });
+
+      wrap.innerHTML = '<div class="history-table-wrap">'
+        + '<table class="history-table">'
+        + '<thead><tr><th>Day</th><th>Buy (live)</th><th>Sell (live)</th><th>Net</th><th>Trend</th><th>Strategy</th></tr></thead>'
+        + '<tbody>' + rows + '</tbody>'
+        + '</table>'
+        + '<div class="muted" style="margin-top:8px; font-size:11px;">source: ' + cssEsc(source) + ' + investment_analysis_cycle_*.json</div>'
+        + '</div>';
+    }
+
+    function rerenderPositionsOnly() {
+      if (!lastPayload) return;
+      renderPositions(lastPayload);
+    }
+
+    let refreshInFlight = false;
+    async function refresh() {
+      if (refreshInFlight) return;
+      refreshInFlight = true;
+      const meta = document.getElementById('snapshot-meta');
+      const modePill = document.getElementById('mode-pill');
+      const cashHero = document.getElementById('cash-hero');
+      const positionsWrap = document.getElementById('positions-wrap');
+
+      try {
+        const r = await fetch('/api/trading/portfolio', { cache: 'no-store' });
+        const payload = await r.json();
+
+        if (!r.ok || !payload || payload.success !== true) {
+          const err = payload && (payload.detail || payload.error) ? String(payload.detail || payload.error) : 'unknown error';
+          if (!lastPayload && positionsWrap) {
+            positionsWrap.innerHTML = '<div class="error">Portfolio fetch failed: ' + cssEsc(err) + '</div>';
+          }
+          if (meta) {
+            meta.textContent = lastPayload ? 'LAST UPDATE: cached snapshot (refresh failed)' : 'last update failed';
+          }
+          return;
+        }
+
+        renderPortfolioSnapshot(payload);
+        savePortfolioCache(payload);
+      } catch (e) {
+        if (!lastPayload && positionsWrap) {
+          positionsWrap.innerHTML = '<div class="error">Portfolio fetch failed: ' + cssEsc(String(e)) + '</div>';
+        }
+        if (meta) {
+          meta.textContent = lastPayload ? 'LAST UPDATE: cached snapshot (refresh failed)' : 'last update failed';
+        }
+        if (modePill && lastPayload) {
+          modePill.textContent = 'MODE: ' + String((lastPayload.mode || '--')).toUpperCase();
+        }
+        if (cashHero && lastPayload && lastPayload.account) {
+          const cash = Number(lastPayload.account.cash);
+          cashHero.textContent = Number.isFinite(cash) ? fmtMoney(cash) : '-';
+        }
+      } finally {
+        refreshInFlight = false;
+      }
+    }
+
+    function start() {
+      const filterEl = document.getElementById('positions-filter');
+      const sortEl = document.getElementById('positions-sort');
+      const intervalEl = document.getElementById('auto-refresh-interval');
+      if (filterEl) filterEl.addEventListener('input', rerenderPositionsOnly);
+      if (sortEl) sortEl.addEventListener('change', rerenderPositionsOnly);
+      if (intervalEl) {
+        const storedInterval = Number(localStorage.getItem(AUTO_REFRESH_INTERVAL_KEY));
+        const initialInterval = Number.isFinite(storedInterval) && storedInterval > 0
+          ? storedInterval
+          : DEFAULT_AUTO_REFRESH_INTERVAL_MS;
+        intervalEl.value = String(initialInterval);
+        intervalEl.addEventListener('change', () => {
+          const nextInterval = Number(intervalEl.value);
+          if (Number.isFinite(nextInterval) && nextInterval > 0) {
+            localStorage.setItem(AUTO_REFRESH_INTERVAL_KEY, String(nextInterval));
+          }
+          if (timer) clearInterval(timer);
+          if (Number.isFinite(nextInterval) && nextInterval > 0) {
+            timer = setInterval(refresh, nextInterval);
+          }
+        });
+      }
+
+      const cached = loadPortfolioCache();
+      if (cached) {
+        renderPortfolioSnapshot(cached);
+        const meta = document.getElementById('snapshot-meta');
+        if (meta) {
+          const ts = Number(cached.timestamp);
+          const when = Number.isFinite(ts) ? new Date(ts * 1000).toLocaleTimeString('en-US') : 'cached';
+          meta.textContent = 'LAST UPDATE: ' + when + ' (cached)';
+        }
+      }
+
+      refresh();
+      if (timer) clearInterval(timer);
+      const startInterval = intervalEl
+        ? Number(intervalEl.value)
+        : DEFAULT_AUTO_REFRESH_INTERVAL_MS;
+      timer = setInterval(refresh, Number.isFinite(startInterval) && startInterval > 0 ? startInterval : DEFAULT_AUTO_REFRESH_INTERVAL_MS);
+    }
+
+    start();
+  })();
+  </script>
+</body>
+</html>

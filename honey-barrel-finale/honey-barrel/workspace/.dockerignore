@@ -1,0 +1,267 @@
+# flyctl launch added from .gitignore
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.venv
+**/*.egg-info
+
+# SQLite (local dev)
+**/*.db
+**/*.db-journal
+
+# Env
+**/.env.bak
+**/.env.*.local
+
+# IDE
+**/.vscode
+**/.idea
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# Docker
+**/*.log
+
+# flyctl launch added from .venv/.gitignore
+# Created by venv; see https://docs.python.org/3/library/venv.html
+.venv/**/*
+
+# flyctl launch added from openclaw-data/.gitignore
+openclaw-data/**/workspace
+openclaw-data/**/linuxbrew
+openclaw-data/**/*.log
+openclaw-data/**/tmp
+openclaw-data/**/cache
+
+# flyctl launch added from openclaw-data/linuxbrew/Homebrew/.gitignore
+# First, ignore everything.
+openclaw-data/linuxbrew/Homebrew/*
+
+# Explicitly ignore OS X Finder thumbnail files.
+openclaw-data/linuxbrew/Homebrew/**/.DS_Store
+
+# Unignore the contents of `Library` as that's where our code lives.
+!openclaw-data/linuxbrew/Homebrew/Library
+
+# Ignore files within `Library` (again).
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/.npmignore
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/bin
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/doc
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/prof
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/.gem
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/.cargo
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/.subversion
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/coverage
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/junit
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/fs_leak_log
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/vendor/portable-ruby
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/vendor/brew-rs
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/rust/brew-rs
+openclaw-data/linuxbrew/Homebrew/Library/Taps
+openclaw-data/linuxbrew/Homebrew/Library/PinnedTaps
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/.byebug_history
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/.npm
+openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/.rdbg_history
+
+# Ignore Bundler files
+openclaw-data/linuxbrew/Homebrew/**/**/.bundle/bin
+openclaw-data/linuxbrew/Homebrew/**/**/.bundle/cache
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/.homebrew_gem_groups
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/.homebrew_vendor_version
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/bundler.lock
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/bin
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/build_info
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/cache
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/extensions
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/*/*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/plugins
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/specifications
+
+# Ignore Ruby gems for versions other than we explicitly vendor.
+# Keep this in sync with the list in standalone/init.rb.
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/4.0.0
+
+# Ignore Bundler binary files
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/**/*.bundle
+
+# Ignore YARD files
+openclaw-data/linuxbrew/Homebrew/**/**/.yardoc
+
+# Unignore vendored gems
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/*/*COPYING*
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/*/*LICENSE*
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/*/lib
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/addressable-*/data
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/public_suffix-*/data
+
+# Ignore partially included gems where we don't need all files
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/.*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/*.md
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/*.rdoc
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/*.gemspec
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/Gemfile
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/Rakefile
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/examples
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/lib/**/*
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/lib/mechanize
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/lib/mechanize/http
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/lib/mechanize/http/content_disposition_parser.rb
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/lib/mechanize/version.rb
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/gems/mechanize-*/test
+
+# Ignore dependencies we don't wish to vendor
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ast-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/benchmark-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/bigdecimal-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/bootsnap-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/bundler-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/byebug-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/coderay-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/colorize-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/commander-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/csv-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/diff-lcs-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/docile-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/drb-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ecma-re-validator-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/erubi-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/hana-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/highline-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/io-console-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/jaro_winkler-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/json-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/json_schemer-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/kramdown-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/language_server-protocol-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/lint_roller-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/mcp-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/method_source-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/mini_portile2-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/minitest-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/msgpack-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/netrc-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ntlm-http-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ostruct-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/parallel-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/parallel_tests-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/parlour-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/parser-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/powerpack-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/prettier_print-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/prism-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/psych-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/pry-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/pycall-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/racc-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rainbow-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rbi-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rbs-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rdoc-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/redcarpet-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/regexp_parser-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/reline-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/require-hooks-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rexml-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-core-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-expectations-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec_junit_formatter-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-mocks-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-retry-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-support-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rspec-sorbet-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rubocop-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/rubydex-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ruby-lsp-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ruby-prof-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/ruby-progressbar-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/simplecov-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/simplecov-html-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/simplecov_json_formatter-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/simpleidn-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/sorbet-*
+!openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/sorbet-runtime-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/spoom-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/stackprof-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/strscan-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/syntax_tree-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/tapioca-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/test-prof-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/thor-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/tsort-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/unicode-display_width-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/unicode-emoji-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/unparser-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/uri_template-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/vernier-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/webrobots-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/yard-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/bundle/ruby/*/gems/yard-sorbet-*
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/cache
+openclaw-data/linuxbrew/Homebrew/**/**/vendor/specifications
+
+# Ignore `bin` contents (again).
+openclaw-data/linuxbrew/Homebrew/bin
+
+# Unignore our `brew` script.
+!openclaw-data/linuxbrew/Homebrew/bin/brew
+
+# Unignore our configuration/completions/documentation.
+!openclaw-data/linuxbrew/Homebrew/.devcontainer
+!openclaw-data/linuxbrew/Homebrew/.github
+!openclaw-data/linuxbrew/Homebrew/completions
+!openclaw-data/linuxbrew/Homebrew/docs
+!openclaw-data/linuxbrew/Homebrew/manpages
+!openclaw-data/linuxbrew/Homebrew/CODEOWNERS
+
+# Unignore our packaging files
+!openclaw-data/linuxbrew/Homebrew/package
+openclaw-data/linuxbrew/Homebrew/package/resources/LICENSE.rtf
+
+# Ignore generated documentation site
+openclaw-data/linuxbrew/Homebrew/docs/_site
+openclaw-data/linuxbrew/Homebrew/docs/.jekyll-metadata
+openclaw-data/linuxbrew/Homebrew/docs/vendor
+openclaw-data/linuxbrew/Homebrew/docs/rubydoc
+
+# Unignore our root-level metadata files.
+!openclaw-data/linuxbrew/Homebrew/.dockerignore
+!openclaw-data/linuxbrew/Homebrew/.editorconfig
+!openclaw-data/linuxbrew/Homebrew/.gitignore
+!openclaw-data/linuxbrew/Homebrew/.irb_config
+!openclaw-data/linuxbrew/Homebrew/.licenses
+!openclaw-data/linuxbrew/Homebrew/.licenses/**
+!openclaw-data/linuxbrew/Homebrew/.ruby-version
+!openclaw-data/linuxbrew/Homebrew/.shellcheckrc
+!openclaw-data/linuxbrew/Homebrew/.vale.ini
+!openclaw-data/linuxbrew/Homebrew/.yardopts
+!openclaw-data/linuxbrew/Homebrew/CHANGELOG.md
+!openclaw-data/linuxbrew/Homebrew/CONTRIBUTING.md
+!openclaw-data/linuxbrew/Homebrew/Dockerfile
+!openclaw-data/linuxbrew/Homebrew/Dockerfile.test.yml
+!openclaw-data/linuxbrew/Homebrew/LICENSE.txt
+!openclaw-data/linuxbrew/Homebrew/README.md
+
+# Unignore tests' bundle config
+!openclaw-data/linuxbrew/Homebrew/Library/Homebrew/test/.bundle/config
+
+# Unignore editor configuration
+!openclaw-data/linuxbrew/Homebrew/.sublime
+openclaw-data/linuxbrew/Homebrew/.sublime/homebrew.sublime-workspace
+!openclaw-data/linuxbrew/Homebrew/.vscode
+
+# Unignore AI configuration
+!openclaw-data/linuxbrew/Homebrew/.cursor
+!openclaw-data/linuxbrew/Homebrew/.claude
+
+# Ignore local AI configuration
+openclaw-data/linuxbrew/Homebrew/.claude/settings.local.json
+
+# Ignore tmp files
+openclaw-data/linuxbrew/Homebrew/**/**/tmp
+fly.toml

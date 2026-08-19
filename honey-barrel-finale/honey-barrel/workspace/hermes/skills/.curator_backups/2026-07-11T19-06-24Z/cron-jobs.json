@@ -1,0 +1,45 @@
+{
+  "jobs": [
+    {
+      "id": "7169dd9874ad",
+      "name": "Daily Investment Watchlist Report Generator",
+      "prompt": "Execute pe\u0142ny cykl skilla 'investment-analyst' z watchlist\u0105 i wygenerowanym raportem (JSON). Kiedy ju\u017c uzyskasz finalny ranking JSON w pami\u0119ci operacyjnej, musisz wykona\u0107 ostateczny krok zapisywania tego pliku.\n\n**Instrukcja Zapisu Raportu:**\n1.  Wygeneruj wynik analizy zgodnie z logik\u0105 skilla i upewnij si\u0119, \u017ce jest on dost\u0119pny jako zmienna wynikowa/JSON.\n2.  Zapisz ten raport do \u015bcie\u017cki: `/workspace/reports/$(date +%Y-%m-%d)_latest_watchlist_report.json`. U\u017cyj narz\u0119dzia `write_file` z tymi parametrami.\n\nPami\u0119taj, \u017ce to jest proces pe\u0142nego cyklu analitycznego - Analiza -> Generacja Raportu -> Zapis do pliku konfiguracyjnymi sta\u0142ymi \u015bcie\u017ck\u0105 czasu i nazwy Watchlist: /workspace/reports/YYYY-MM-DD_latest_watchlist_report.json.",
+      "skills": [
+        "investment-analyst"
+      ],
+      "skill": "investment-analyst",
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "once",
+        "run_at": "2026-06-30T20:49:43.973289+02:00",
+        "display": "once in 30m"
+      },
+      "schedule_display": "once in 30m",
+      "repeat": {
+        "times": 1,
+        "completed": 0
+      },
+      "enabled": false,
+      "state": "paused",
+      "paused_at": "2026-07-10T02:56:49.156710+02:00",
+      "paused_reason": null,
+      "created_at": "2026-06-30T20:19:43.973352+02:00",
+      "next_run_at": "2026-06-30T22:58:20.875856+02:00",
+      "last_run_at": null,
+      "last_status": null,
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "profile": null
+    }
+  ],
+  "updated_at": "2026-07-10T02:56:49.157275+02:00"
+}

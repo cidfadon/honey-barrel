@@ -1,0 +1,13 @@
+workspace:
+  root: /workspace
+
+servers:
+
+  filesystem:
+    url: http://filesystem-mcp:3000
+
+  terminal:
+    url: http://terminal-mcp:3000
+
+  git:
+    url: http://git-mcp:3000

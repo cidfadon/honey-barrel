@@ -1,0 +1,16 @@
+{
+  "order_id": "none",
+  "order_status": "hold",
+  "symbol": "NFLX",
+  "submitted_at": "2026-08-18T21:46:03+02:00",
+  "action": "hold",
+  "executed_write": false,
+  "current_price": 78.9500,
+  "final_qty": 0,
+  "target_notional": 0,
+  "confidence": 0.60,
+  "sizing_rationale": "buy signal downgraded to hold: insufficient buying power; no write tool executed",
+  "financial_strategy": "strategies/OPENING_RANGE_BREAKOUT_STRATEGY.md",
+  "financial_strategy_file": "strategies/OPENING_RANGE_BREAKOUT_STRATEGY.md",
+  "execution_mode": "direct_alpaca_fallback"
+}

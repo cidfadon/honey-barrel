@@ -1,0 +1,14 @@
+Use only MCP tools.
+Do not run any skill.
+Do not use narrative mode.
+
+Task for watchlist ${WATCHLIST_TICKERS}:
+1) Call alpaca clock_get.
+2) Compute confidence-based sizing using /workspace/docs/INVESTMENT_ANALYST_CONFIDENCE_POLITYCS.md with:
+   buy_confidence_threshold=${BUY_CONFIDENCE_THRESHOLD}, base_notional_per_trade=${BASE_NOTIONAL_PER_TRADE_USD}, max_notional_per_symbol=${MAX_NOTIONAL_PER_SYMBOL_USD}, min_trade_qty=${MIN_TRADE_QTY}, qty_step=${QTY_STEP}.
+3) Execute one real Alpaca write order now via order_place_market or order_place_limit.
+4) Verify the order via alpaca read call.
+5) Return compact JSON only with: order_id, order_status, symbol, submitted_at, final_qty, target_notional, confidence, sizing_rationale.
+
+If direct tool name is unavailable, call tools/list and use the exposed alias that ends with order_place_market or order_place_limit.
+If no real write is executed, return FAILURE.

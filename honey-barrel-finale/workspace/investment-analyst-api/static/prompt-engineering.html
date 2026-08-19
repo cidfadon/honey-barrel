@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PROMPT Engineering</title>
+  <style>
+    :root {
+      --bg: #07090c;
+      --bg2: #0d1117;
+      --border: #1f2630;
+      --text: #d7dde4;
+      --muted: #6a7480;
+      --accent: #ffb000;
+      --ok: #8fe3a4;
+      --err: #ff7d7d;
+      --link: #9ecbff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 13px/1.4 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .title {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin: 0;
+    }
+    .muted { color: var(--muted); }
+    .topbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0 14px 0;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      padding: 6px 10px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { border-color: var(--accent); color: var(--accent); }
+    .panel {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .label {
+      display: block;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin: 0 0 6px 0;
+      font-size: 12px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 170px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--text);
+      padding: 10px;
+      font: 12px/1.45 "JetBrains Mono", ui-monospace, monospace;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      vertical-align: top;
+    }
+    th {
+      color: var(--accent);
+      text-align: left;
+      background: #0b0f14;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .params-wrap {
+      max-height: 58vh;
+      overflow: auto;
+      border: 1px solid var(--border);
+    }
+    input.param-value {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--text);
+      padding: 6px 8px;
+      font: 12px/1.35 "JetBrains Mono", ui-monospace, monospace;
+    }
+    .status {
+      min-height: 20px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+    a { color: var(--link); }
+    a:hover { color: var(--accent); }
+    code {
+      background: #0b0f14;
+      border: 1px solid var(--border);
+      padding: 1px 4px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 8px 12px;
+      align-items: start;
+    }
+    .meta-key {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-size: 11px;
+      padding-top: 3px;
+    }
+    .meta-value {
+      min-width: 0;
+      word-break: break-word;
+    }
+    .doc-hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .strategy-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+    .strategy-file-input {
+      flex: 1 1 320px;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--text);
+      padding: 6px 8px;
+      font: 12px/1.35 "JetBrains Mono", ui-monospace, monospace;
+    }
+    .strategy-checkbox-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px;
+    }
+    .strategy-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font: 12px/1.35 "JetBrains Mono", ui-monospace, monospace;
+      white-space: nowrap;
+    }
+    .strategy-checkbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+      border-radius: 6px;
+    }
+    .strategy-preview {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: #0b0f14;
+      color: var(--text);
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow: auto;
+      font: 11px/1.45 "JetBrains Mono", ui-monospace, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">PROMPT ENGINEERING</h1>
+    <div class="muted">Edit prompt and input defaults used by scripts/daily_investment_watchlist_report_generator.sh.</div>
+
+    <div class="topbar">
+      <a class="btn" href="/ui/" target="_top">BACK TO DASHBOARD</a>
+      <a class="btn" href="/ui/strategy.html">OPEN STRATEGY ATTACHMENT</a>
+      <button id="reload-btn" class="btn" type="button">RELOAD</button>
+      <button id="save-btn" class="btn primary" type="button">SAVE CHANGES</button>
+      <span class="muted">API: <code>/api/prompt-engineering/config</code></span>
+    </div>
+
+    <section class="panel">
+      <span class="label">Runner Script & Documentation</span>
+      <div class="meta-grid">
+        <div class="meta-key">Script Path</div>
+        <div id="script-path" class="meta-value muted">loading...</div>
+
+        <div class="meta-key">Runbook</div>
+        <div class="meta-value">
+          <a id="runbook-link" href="/docs-browser/file/RUNBOOK_daily_investment_watchlist_report_generator.md?raw=0" target="_blank" rel="noopener noreferrer">RUNBOOK_daily_investment_watchlist_report_generator.md</a>
+          <div class="muted" style="margin-top:4px;"><code>/workspace/docs/RUNBOOK_daily_investment_watchlist_report_generator.md</code></div>
+          <div class="doc-hint">This document contains the full explanation of all script variables and recommended runtime presets.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <label for="prompt-input" class="label">PROMPT</label>
+      <textarea id="prompt-input" spellcheck="false" placeholder="PROMPT variable from runner script"></textarea>
+      <div class="muted" style="margin-top:6px;">Multiline text is flattened to a single line when saving to keep bash assignment valid.</div>
+    </section>
+
+    <section class="panel">
+      <span class="label">Input Parameters (all defaults from <code>${VAR:-default}</code>)</span>
+      <div class="params-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 260px;">PARAMETER</th>
+              <th>DEFAULT VALUE</th>
+            </tr>
+          </thead>
+          <tbody id="params-body">
+            <tr><td colspan="2" class="muted">loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div id="status" class="status muted"></div>
+  </div>
+
+  <script>
+    const promptInput = document.getElementById('prompt-input');
+    const paramsBody = document.getElementById('params-body');
+    const statusEl = document.getElementById('status');
+    const scriptPathEl = document.getElementById('script-path');
+    const saveBtn = document.getElementById('save-btn');
+    const reloadBtn = document.getElementById('reload-btn');
+    let currentIncludeFinancialStrategy = false;
+    let currentFinancialStrategyFile = '';
+    let currentFinancialStrategyFiles = [];
+
+    function setStatus(msg, kind) {
+      statusEl.textContent = msg || '';
+      statusEl.className = 'status ' + (kind || 'muted');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderParams(params) {
+      if (!Array.isArray(params) || params.length === 0) {
+        paramsBody.innerHTML = '<tr><td colspan="2" class="muted">no editable params detected</td></tr>';
+        return;
+      }
+
+      const rows = params.map((row) => {
+        const name = row.name || '';
+        const value = row.default ?? '';
+        return `
+          <tr>
+            <td><code>${escapeHtml(name)}</code></td>
+            <td>
+              <input
+                class="param-value"
+                data-param-name="${escapeHtml(name)}"
+                value="${escapeHtml(value)}"
+                spellcheck="false"
+              />
+            </td>
+          </tr>
+        `;
+      });
+
+      paramsBody.innerHTML = rows.join('');
+    }
+
+    function collectParams() {
+      const map = {};
+      document.querySelectorAll('input[data-param-name]').forEach((el) => {
+        const key = el.getAttribute('data-param-name');
+        map[key] = el.value;
+      });
+      return map;
+    }
+
+    async function loadConfig() {
+      setStatus('Loading configuration...', 'muted');
+      saveBtn.disabled = true;
+      reloadBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/prompt-engineering/config');
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Load failed');
+        }
+
+        scriptPathEl.textContent = payload.script_path || 'unknown';
+        promptInput.value = payload.prompt || '';
+        currentIncludeFinancialStrategy = Boolean(payload.include_financial_strategy);
+        currentFinancialStrategyFile = payload.financial_strategy_file || '';
+        currentFinancialStrategyFiles = Array.isArray(payload.financial_strategy_files)
+          ? payload.financial_strategy_files
+          : [];
+        renderParams(payload.params || []);
+        setStatus(`Loaded ${payload.params?.length || 0} parameters.`, 'ok');
+      } catch (err) {
+        setStatus(`Load error: ${err.message || err}`, 'err');
+      } finally {
+        saveBtn.disabled = false;
+        reloadBtn.disabled = false;
+      }
+    }
+
+    async function saveConfig() {
+      setStatus('Saving changes...', 'muted');
+      saveBtn.disabled = true;
+      reloadBtn.disabled = true;
+
+      try {
+        const body = {
+          prompt: promptInput.value,
+          params: collectParams(),
+          include_financial_strategy: currentIncludeFinancialStrategy,
+          financial_strategy_file: currentFinancialStrategyFile,
+          financial_strategy_files: currentFinancialStrategyFiles,
+        };
+
+        const response = await fetch('/api/prompt-engineering/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.detail || payload.error || 'Save failed');
+        }
+
+        promptInput.value = payload.prompt || promptInput.value;
+        currentIncludeFinancialStrategy = Boolean(payload.include_financial_strategy);
+        currentFinancialStrategyFile = payload.financial_strategy_file || '';
+        currentFinancialStrategyFiles = Array.isArray(payload.financial_strategy_files)
+          ? payload.financial_strategy_files
+          : [];
+        renderParams(payload.params || []);
+        setStatus(`Saved. Updated params: ${payload.params_updated ?? 0}.`, 'ok');
+      } catch (err) {
+        setStatus(`Save error: ${err.message || err}`, 'err');
+      } finally {
+        saveBtn.disabled = false;
+        reloadBtn.disabled = false;
+      }
+    }
+
+    saveBtn.addEventListener('click', saveConfig);
+    reloadBtn.addEventListener('click', loadConfig);
+
+    loadConfig();
+  </script>
+</body>
+</html>

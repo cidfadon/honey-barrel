@@ -1,0 +1,35 @@
+FROM node:20-alpine
+
+# system deps (MCP + tooling layer)
+RUN apk update && apk add --no-cache \
+    git \
+    ripgrep \
+    bash \
+    grep \
+    findutils \
+    coreutils \
+    sysstat \
+    curl \
+    tini
+
+# use proper process init (important for MCP subprocess stability)
+ENTRYPOINT ["/sbin/tini", "--"]
+
+WORKDIR /app
+
+# dependencies first (better cache layer)
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# app source
+COPY . .
+
+# runtime env safety
+ENV NODE_ENV=production
+ENV MCP_WORKSPACE=/workspace
+ENV WORKSPACE_DIR=/workspace
+ENV PORT=3001
+
+EXPOSE 3001
+
+CMD ["node", "server.js"]

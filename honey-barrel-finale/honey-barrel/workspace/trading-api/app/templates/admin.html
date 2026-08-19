@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trading212 × OpenClaw — Admin</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --txt: #e6edf3; --mute: #8b949e; --acc: #58a6ff; --buy: #3fb950; --sell: #f85149;
+    --warn: #d29922; --font: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font-family: var(--font);
+         padding: 32px 48px; }
+  h1 { margin: 0 0 4px; font-weight: 600; letter-spacing: -0.5px; }
+  h1 span { color: var(--acc); }
+  .sub { color: var(--mute); margin-bottom: 32px; }
+  h2 { margin: 32px 0 12px; font-size: 14px; text-transform: uppercase;
+       letter-spacing: 2px; color: var(--mute); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+          border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+           font-size: 13px; vertical-align: top; }
+  th { background: #21262d; color: var(--mute); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .BUY  { color: var(--buy); font-weight: 600; }
+  .SELL { color: var(--sell); font-weight: 600; }
+  .HOLD { color: var(--mute); }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word;
+        font-size: 12px; color: var(--mute); max-width: 420px; }
+  .tag { display: inline-block; padding: 1px 8px; border: 1px solid var(--border);
+         border-radius: 999px; font-size: 11px; color: var(--mute); }
+  .profit-pos { color: var(--buy); font-weight: 600; }
+  .profit-neg { color: var(--sell); font-weight: 600; }
+  .profit-neu { color: var(--mute); }
+  /* detail panel */
+  .day-detail { display: none; background: #0d1117; border: 1px solid var(--border);
+                border-radius: 6px; padding: 20px 24px; margin: 8px 0 20px; }
+  .day-detail.open { display: block; }
+  .day-detail h3 { margin: 0 0 10px; font-size: 13px; color: var(--acc); }
+  .day-detail h4 { margin: 18px 0 6px; font-size: 12px; text-transform: uppercase;
+                   letter-spacing: 1.5px; color: var(--mute); }
+  .section-table { width: 100%; border-collapse: collapse; font-size: 12px;
+                   background: var(--panel); border: 1px solid var(--border);
+                   border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+  .section-table th { background: #21262d; color: var(--mute); padding: 7px 10px;
+                      font-weight: 500; text-align: left; }
+  .section-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .section-table tr:last-child td { border-bottom: none; }
+  .btn-row { display: inline-block; cursor: pointer; color: var(--acc); font-size: 12px;
+             text-decoration: underline; }
+  .csv-link { font-size: 11px; color: var(--mute); text-decoration: none;
+              border: 1px solid var(--border); padding: 2px 8px; border-radius: 999px; }
+  .csv-link:hover { color: var(--buy); border-color: var(--buy); }
+  .best-row { background: rgba(63,185,80,0.08) !important; }
+  .snap-kv { font-size: 12px; color: var(--mute); }
+  .snap-kv span { color: var(--txt); }
+  .form-inline { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .form-inline input, .form-inline button {
+    background: var(--panel); border: 1px solid var(--border); color: var(--txt);
+    padding: 6px 12px; font-family: var(--font); font-size: 13px; border-radius: 4px; }
+  .form-inline button { cursor: pointer; border-color: var(--acc); color: var(--acc); }
+  .form-inline button:hover { background: rgba(88,166,255,0.1); }
+  #log-status { font-size: 12px; color: var(--mute); }
+</style>
+</head>
+<body>
+  <h1>trading212 <span>×</span> openclaw</h1>
+  <div class="sub">last 20 LLM analyses · last 20 orders · historical trends</div>
+
+  <h2>llm analyses</h2>
+  <table>
+    <tr><th>ts</th><th>model</th><th>action</th><th>ticker</th><th>qty</th>
+        <th>conf.</th><th>rationale</th></tr>
+    {% for a in analyses %}
+    <tr>
+      <td>{{ a.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      <td><span class="tag">{{ a.model }}</span></td>
+      <td class="{{ (a.decision or {}).get('action', 'HOLD') }}">
+        {{ (a.decision or {}).get('action', '—') }}
+      </td>
+      <td>{{ (a.decision or {}).get('ticker') or '—' }}</td>
+      <td>{{ (a.decision or {}).get('quantity') or '—' }}</td>
+      <td>{{ '%.0f%%' | format(100 * ((a.decision or {}).get('confidence') or 0)) }}</td>
+      <td><pre>{{ (a.decision or {}).get('rationale', '') }}</pre></td>
+    </tr>
+    {% endfor %}
+    {% if not analyses %}
+    <tr><td colspan="7" style="color: var(--mute); text-align: center;">no analyses yet</td></tr>
+    {% endif %}
+  </table>
+
+  <h2>orders</h2>
+  <table>
+    <tr><th>ts</th><th>id</th><th>t212 id</th><th>ticker</th><th>side</th>
+        <th>qty</th><th>type</th><th>limit</th><th>status</th></tr>
+    {% for o in orders %}
+    <tr>
+      <td>{{ o.ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      <td>{{ o.id }}</td>
+      <td>{{ o.t212_order_id or '—' }}</td>
+      <td>{{ o.ticker }}</td>
+      <td class="{{ o.side }}">{{ o.side }}</td>
+      <td>{{ o.qty }}</td>
+      <td><span class="tag">{{ o.order_type }}</span></td>
+      <td>{{ o.limit_price or '—' }}</td>
+      <td>{{ o.status }}</td>
+    </tr>
+    {% endfor %}
+    {% if not orders %}
+    <tr><td colspan="9" style="color: var(--mute); text-align: center;">no orders yet</td></tr>
+    {% endif %}
+  </table>
+
+  <!-- ================================================================== -->
+  <h2>historical trends</h2>
+
+  <div class="form-inline">
+    <label style="color:var(--mute);font-size:12px;">Save today's log:</label>
+    <input type="number" id="profit-input" placeholder="profit (optional)" step="0.01" style="width:160px;">
+    <input type="text"   id="notes-input"  placeholder="notes (optional)"  style="width:240px;">
+    <button onclick="saveDailyLog()">⬇ save today</button>
+    <span id="log-status"></span>
+  </div>
+
+  <table id="trends-table">
+    <thead>
+      <tr>
+        <th>date</th>
+        <th>strategy</th>
+        <th>orders</th>
+        <th>analyses</th>
+        <th>profit / loss</th>
+        <th>notes</th>
+        <th>log</th>
+        <th>detail</th>
+      </tr>
+    </thead>
+    <tbody id="trends-body">
+      <tr><td colspan="8" style="color:var(--mute);text-align:center;">loading…</td></tr>
+    </tbody>
+  </table>
+
+  <!-- per-day drill-down panel (rendered dynamically) -->
+  <div id="day-panel" class="day-detail"></div>
+
+<script>
+  // ── helpers ──────────────────────────────────────────────────────────────
+  function fmt(v, decimals=2) {
+    if (v == null) return '—';
+    return Number(v).toFixed(decimals);
+  }
+  function profitClass(v) {
+    if (v == null) return 'profit-neu';
+    return v > 0 ? 'profit-pos' : v < 0 ? 'profit-neg' : 'profit-neu';
+  }
+  function profitLabel(v) {
+    if (v == null) return '—';
+    return (v > 0 ? '+' : '') + Number(v).toFixed(2);
+  }
+
+  // ── load summary ─────────────────────────────────────────────────────────
+  async function loadTrends() {
+    const res = await fetch('/api/daily-logs');
+    const rows = res.ok ? await res.json() : [];
+
+    if (!rows.length) {
+      document.getElementById('trends-body').innerHTML =
+        '<tr><td colspan="8" style="color:var(--mute);text-align:center;">no daily logs yet — click "save today" to create the first one</td></tr>';
+      return;
+    }
+
+    // Find best-profit day
+    let bestIdx = 0;
+    let bestProfit = rows[0].profit;
+    rows.forEach((r, i) => {
+      if (r.profit != null && (bestProfit == null || r.profit > bestProfit)) {
+        bestProfit = r.profit;
+        bestIdx = i;
+      }
+    });
+
+    const tbody = document.getElementById('trends-body');
+    tbody.innerHTML = rows.map((r, i) => `
+      <tr class="${i === bestIdx && r.profit != null ? 'best-row' : ''}">
+        <td>${r.trade_date}${i === bestIdx && r.profit != null ? ' <span title="Best profit day" style="color:var(--buy)">★</span>' : ''}</td>
+        <td><span class="tag">${r.strategy || '—'}</span></td>
+        <td>${r.orders_count}</td>
+        <td>${r.analyses_count}</td>
+        <td class="${profitClass(r.profit)}">${profitLabel(r.profit)}</td>
+        <td style="max-width:200px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="${r.notes||''}">${r.notes || '—'}</td>
+        <td>${r.log_file
+              ? `<a class="csv-link" href="/api/daily-logs/${r.trade_date}/csv" download="${r.log_file}">↓ CSV</a>`
+              : '—'}</td>
+        <td><span class="btn-row" onclick="toggleDay('${r.trade_date}')">▶ view</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // ── per-day detail ────────────────────────────────────────────────────────
+  let _openDate = null;
+
+  async function toggleDay(date) {
+    const panel = document.getElementById('day-panel');
+    if (_openDate === date && panel.classList.contains('open')) {
+      panel.classList.remove('open');
+      _openDate = null;
+      // reset all ▶ labels
+      document.querySelectorAll('.btn-row').forEach(el => { if (el.textContent.startsWith('▼')) el.textContent = '▶ view'; });
+      return;
+    }
+    _openDate = date;
+    panel.classList.remove('open');
+    panel.innerHTML = '<em style="color:var(--mute)">loading…</em>';
+
+    const res = await fetch(`/api/daily-logs/${date}`);
+    if (!res.ok) { panel.innerHTML = '<em style="color:var(--sell)">failed to load</em>'; panel.classList.add('open'); return; }
+    const d = await res.json();
+
+    // Reset button labels
+    document.querySelectorAll('.btn-row').forEach(el => el.textContent = '▶ view');
+    // Highlight active
+    document.querySelectorAll('.btn-row').forEach(el => {
+      if (el.getAttribute('onclick') === `toggleDay('${date}')`) el.textContent = '▼ hide';
+    });
+
+    const snap = d.snapshot || {};
+    const cash = snap.cash || {};
+    const positions = snap.positions || [];
+
+    // ── snapshot summary ──
+    const snapHtml = `
+      <h4>snapshot (end-of-day)</h4>
+      <div class="snap-kv">
+        free cash: <span>${fmt(cash.free)}</span> &nbsp;|&nbsp;
+        invested: <span>${fmt(cash.invested)}</span> &nbsp;|&nbsp;
+        result: <span>${fmt(cash.result)}</span> &nbsp;|&nbsp;
+        blocked: <span>${fmt(cash.blocked)}</span>
+      </div>
+      <table class="section-table" style="margin-top:8px">
+        <tr><th>ticker</th><th>qty</th><th>avg. price</th><th>current price</th>
+            <th>P&amp;L</th><th>P&amp;L %</th><th>FX impact</th></tr>
+        ${positions.length ? positions.map(p => `
+          <tr>
+            <td>${p.ticker||p.symbol||'—'}</td>
+            <td>${fmt(p.quantity,4)}</td>
+            <td>${fmt(p.averagePrice||p.avg_price)}</td>
+            <td>${fmt(p.currentPrice||p.current_price)}</td>
+            <td class="${(p.ppl||0)>0?'profit-pos':(p.ppl||0)<0?'profit-neg':'profit-neu'}">${fmt(p.ppl)}</td>
+            <td>${fmt(p.fxPpl||p.fx_ppl)}</td>
+            <td>${fmt(p.initialFillDate||p.fxImpact||p.fx_impact)}</td>
+          </tr>`).join('') : '<tr><td colspan="7" style="color:var(--mute)">no positions</td></tr>'}
+      </table>`;
+
+    // ── orders ──
+    const ordersHtml = `
+      <h4>orders (${d.orders.length})</h4>
+      <table class="section-table">
+        <tr><th>time</th><th>id</th><th>t212 id</th><th>ticker</th><th>side</th>
+            <th>qty</th><th>type</th><th>limit</th><th>status</th></tr>
+        ${d.orders.length ? d.orders.map(o => `
+          <tr>
+            <td>${(o.ts||'').replace('T',' ').slice(0,19)}</td>
+            <td>${o.id||'—'}</td><td>${o.t212_order_id||'—'}</td>
+            <td>${o.ticker}</td>
+            <td class="${o.side}">${o.side}</td>
+            <td>${fmt(o.qty,4)}</td>
+            <td><span class="tag">${o.order_type}</span></td>
+            <td>${o.limit_price!=null?fmt(o.limit_price):'—'}</td>
+            <td>${o.status}</td>
+          </tr>`).join('') : '<tr><td colspan="9" style="color:var(--mute)">no orders</td></tr>'}
+      </table>`;
+
+    // ── analyses ──
+    const analysesHtml = `
+      <h4>llm analyses / strategy: <span style="color:var(--acc)">${d.strategy||'—'}</span> (${d.analyses.length})</h4>
+      <table class="section-table">
+        <tr><th>time</th><th>model</th><th>action</th><th>ticker</th>
+            <th>qty</th><th>conf.</th><th>rationale</th></tr>
+        ${d.analyses.length ? d.analyses.map(a => {
+          const dec = a.decision||{};
+          return `<tr>
+            <td>${(a.ts||'').replace('T',' ').slice(0,19)}</td>
+            <td><span class="tag">${a.model||'—'}</span></td>
+            <td class="${dec.action||'HOLD'}">${dec.action||'—'}</td>
+            <td>${dec.ticker||'—'}</td>
+            <td>${dec.quantity!=null?fmt(dec.quantity,4):'—'}</td>
+            <td>${dec.confidence!=null?Math.round(dec.confidence*100)+'%':'—'}</td>
+            <td><pre>${dec.rationale||''}</pre></td>
+          </tr>`;
+        }).join('') : '<tr><td colspan="7" style="color:var(--mute)">no analyses</td></tr>'}
+      </table>`;
+
+    panel.innerHTML = `
+      <h3>${date} &nbsp;·&nbsp; profit: <span class="${profitClass(d.profit)}">${profitLabel(d.profit)}</span>
+          &nbsp;·&nbsp; strategy: <span style="color:var(--acc)">${d.strategy||'—'}</span>
+          &nbsp;·&nbsp; <a class="csv-link" href="/api/daily-logs/${date}/csv" download="trading_log_${date}.csv">↓ download CSV</a>
+      </h3>
+      ${d.notes ? `<div class="snap-kv" style="margin-bottom:10px">notes: <span>${d.notes}</span></div>` : ''}
+      ${snapHtml}${ordersHtml}${analysesHtml}`;
+    panel.classList.add('open');
+
+    // scroll into view
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── save today ────────────────────────────────────────────────────────────
+  async function saveDailyLog() {
+    const profit = document.getElementById('profit-input').value;
+    const notes  = document.getElementById('notes-input').value;
+    const status = document.getElementById('log-status');
+    status.textContent = 'saving…';
+    try {
+      const body = {};
+      if (profit !== '') body.profit = parseFloat(profit);
+      if (notes  !== '') body.notes  = notes;
+      const res = await fetch('/api/daily-log', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      status.textContent = `✓ saved ${data.trade_date} — ${data.orders_count} orders, profit: ${profitLabel(data.profit)}`;
+      status.style.color = 'var(--buy)';
+      await loadTrends();
+    } catch (e) {
+      status.textContent = '✗ ' + e.message;
+      status.style.color = 'var(--sell)';
+    }
+  }
+
+  loadTrends();
+</script>
+</body>
+</html>
