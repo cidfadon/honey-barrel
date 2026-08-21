@@ -268,16 +268,22 @@ docker compose exec hermes hermes mcp add terminal --url http://stdio-terminal:3
   Connecting to http://investment-analyst-api:8001/mcp
   Does this server require authentication? [Y/n]: n
 
-  
-
   Enable all 9 tools? [Y/n/select]: y
-Does this server require authentication? [Y/n]: n
+  
+  Does this server require authentication? [Y/n]: n
+  
   Enable all 6 tools? [Y/n/select]: y
+  
   Connecting to http://alpaca-mcp:3001/mcp
+  
   Does this server require authentication? [Y/n]: n
+  
   Enable all 12 tools? [Y/n/select]: Y
+  
   Connecting to http://stdio-terminal:3002/mcp
+  
   Does this server require authentication? [Y/n]: n
+  
   Enable all 1 tools? [Y/n/select]: y
 
 
