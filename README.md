@@ -86,6 +86,32 @@ sudo usermod -aG render,video ollama 2>/dev/null || true
 sudo mkdir -p /etc/systemd/system/ollama.service.d
 printf '[Service]\nEnvironment="HSA_OVERRIDE_GFX_VERSION=10.3.0"\n' | sudo tee /etc/systemd/system/ollama.service.d/override.conf
 ```
+If Ollama still uses CPU instead GPU try restarting Ollama service first:
+
+```bash
+sudo systemctl restart ollama
+```
+The reason is `ollama.service` might be initializating before `amdgpu` itself so `/dev/kfd` and `/dev/dri/renderD128` nodes are not yet there and `udev` is not 100% ready. To solve this, you have to check what rocm version Ollama is using the following command:
+
+```bash
+which ollama && ls -ld /usr/local/lib/ollama/rocm_* /usr/lib/ollama/rocm_* 2>/dev/null
+```
+
+Use that version for this other command:
+
+```bash
+sudo tee /etc/systemd/system/ollama.service.d/override.conf <<'EOF'
+[Unit]
+Wants=dev-kfd.device dev-dri-renderD128.device
+After=dev-kfd.device dev-dri-renderD128.device
+
+[Service]
+Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"
+Environment="HIP_VISIBLE_DEVICES=0"
+Environment="OLLAMA_LLM_LIBRARY=your.rocm.version"
+EOF
+```
+This should work.
 
 ### Install Javascript packet manager 
 
