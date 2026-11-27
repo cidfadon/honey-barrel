@@ -10,19 +10,18 @@ This fork adapts the setup for **Debian** after an Ubuntu compatibility issue wi
 
 I have tested this stack on both **Ubuntu 26.04.01** and **Debian 13.5.0** without major issues. Default user **`me`** was used originally for scripts default to `/home/me/git-repo/honey-barrel/workspace`. If you use a different directory layout, keep your paths and environment variables consistent across scripts and cron jobs.
 
+I always like to start from a minimal headless installation with just SSH server and connect to my machine remotely, but if you feel more confortable using a desktop feel free to do it. Finish the installation and reboot the machine into Debian.
+
 ### Base OS & User Setup
 
-1. Install Debian and while asked to create the new user, create a user named -> `me`. I always like to start from a minimal installation with just SSH server, and connect to my machine remotely, but if you feel more confortable using a desktop feel free to do it. Finish the installation and reboot the machine into Debian.
+1. Install Debian and while asked to create the new user, create a user named -> `me`. 
     
-2. Add user to sudoers: Because this is a minimal installation you will need to install sudo and add me to sudoers.
+2. Add user `me` to sudoers: 
 
 ```bash
-su -
-apt install -y sudo
-usermod -aG sudo me
-exit
+su -c "apt update && apt install -y sudo && usermod -aG sudo me"
 ```
-
+Because this is a minimal installation, you will need to install sudo and add `me` to sudoers.
 *LOGOUT OF YOUR SESSION AND LOGIN AGAIN*
 
 3. Create the base folder and download the project:
