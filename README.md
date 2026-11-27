@@ -1,177 +1,142 @@
-# Installation Guide
+# Honey-Barrel
 
-1. Install Ubuntu 24.04.4 LTS a. while asked to create user, create user name -> `me` b. reboot and run update
+Honey-Barrel is an intraday market and watchlist analysis agent (originally created by **[Marcin Bednarski](https://github.com/git-mb001)** and **[Jakub Bartnik](https://github.com/jakubbartnik)**) that evaluates intraday price fluctuations using a locally running Ollama model.
+
+This fork adapts the setup for **Debian** after an Ubuntu compatibility issue with my motherboard caused system freezes, making Debian a practical and stable alternative for myself alongside the original Ubuntu setup.
+
+
+
+## Installation Guide
+
+I have tested this stack on both **Ubuntu 26.04.01** and **Debian 13.5.0** without major issues. Default user **`me`** was used originally for scripts default to `/home/me/git-repo/honey-barrel/workspace`. If you use a different directory layout, keep your paths and environment variables consistent across scripts and cron jobs.
+
+### Base OS & User Setup
+
+1. Install Debian and while asked to create the new user, create a user named -> `me`. I always like to start from a minimal installation with just SSH server, and connect to my machine remotely, but if you feel more confortable using a desktop feel free to do it. Finish the installation and reboot the machine into Debian.
     
-2. Install the following packages from App Center
-    
-    - Obsidian
-    - Mousepad
-3. Open Firefox, download and install Chrome
-    
-4. Open Chrome and login with your Google account
-    
-    - Go to GitHub and create your account if you don't have it, or just login
-5. Open file explorer and in `/home/me` create new folder `git-repo`
-    
-6. Open terminal and type
-    
+2. Add user to sudoers: Because this is a minimal installation you will need to install sudo and add me to sudoers.
 
 ```
-cd /home/me/git-repo
+su -
+apt install -y sudo
+usermod -aG sudo me
+exit
 ```
 
-## 7. GIT - you can skip it if you just want to download it and place it into folder
+*LOGOUT OF YOUR SESSION AND LOGIN AGAIN*
+
+3. Create the base folder and download the project:
 
 ```
-sudo apt install git
+sudo apt install -y git
+mkdir -p ~/git-repo
+cd ~/git-repo && git clone https://github.com/cidfadon/honey-barrel.git
 ```
 
-9. Generate your ssh key
+### Install Ollama LLM
+
+4. Install Ollama using curl
 
 ```
-ssh-keygen -t ed25519 -C "your_email_address@gmail.com"
-```
-
-10. Now run this command
-
-```
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-cat ~/.ssh/id_ed25519.pub
-```
-
-From the output you will have last line starting with `ssh-ed25519`. Copy this line and go to your GitHub page in Chrome. Click top right at your profile -> Settings -> SSH and GPG Keys. Click on the green button New SSH. Type Title as you wish, leave Key type as Authentication Key and paste content of the line you copied before into the Key field. Save it.
-
-11. In GitHub enter our repository
-
-[https://github.com/honeybarrelorg-collab/honey-barrel-finale](https://github.com/honeybarrelorg-collab/honey-barrel-finale)
-
-a. click on Create new Fork. Leave default name b. go to your profile and click on Repositories. You should see honey barrel there c. click on honey-barrel repo and use green `<>` Code button d. make sure you are on the SSH tab, click on copy button
-
-12. Go back to terminal, make sure you are in `/home/me/git-repo` and paste it from your clipboard
-
-```
-git clone git@github.com:honeybarrelorg-collab/honey-barrel-finale.git
-```
-
-Hit enter — you should see it downloading.
-
-## Continue from here after skipping GIT config
-
-Go to [https://github.com/honeybarrelorg-collab/honey-barrel-finale](https://github.com/honeybarrelorg-collab/honey-barrel-finale) and on the green button called "Code", download ZIP and extract it to `/home/me/git-repo/honey-barrel-finale`.
-
-Done. Now let's open terminal and install all dependencies:
-
-13. Install curl
-
-```
-sudo apt install curl
-```
-
-14. Install net-tools
-
-```
-sudo apt install net-tools
-```
-
-15. Install Ollama
-
-```
+sudo apt install -y curl 
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-After Ollama is installed run
+At the end of the installation you should see something like NVIDIA or AMD GPU ready, otherwise a WARNING will be shown.
+
+---
+**NVIDIA USERS:**
+Because most Nvidia drivers are propietary you have to add *contrib* to trixie main.
 
 ```
-ollama list
+sudo sed -i 's/trixie main non-free-firmware/trixie main contrib non-free non-free-firmware/g' /etc/apt/sources.list
 ```
 
-It will show you your models — we don't expect to see anything apart from NAME, ID, SIZE, MODIFIED at this stage.
+Make sure the command has added *contrib* to trixie main:
 
-Download the Ollama model, type:
+```
+cat /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null
+```
+
+
+5. Download the following model and run a test query.  
 
 ```
 ollama pull batiai/gemma4-e4b:q4
+ollama list
+ollama run batiai/gemma4-e4b:q4 "Sharing is caring. Reply in one short sentence."
+ollama ps
 ```
 
-Let it finish downloading.
-
-Start Ollama
+You should see 100% GPU
 
 ```
-ollama run batiai/gemma4-e4b:q4
+me@debian:~/git-repo/honey-barrel$ ollama ps
+NAME                    ID              SIZE      PROCESSOR    CONTEXT    RUNNER      UNTIL              
+batiai/gemma4-e4b:q4    d682bf87e3a3    3.3 GB    100% GPU     131072     llamacpp    4 minutes from now
 ```
 
-15. Install npm
+---
+**RADEON USERS:**
+In one of my tests, it happened to me that the model was running 100% CPU despite I have a 12GB Radeon and I got my card detected after Ollama installation. 
+
+To solve this I had to add ollama to render and video groups and add HSA_OVERRIDE_GFX_VERSION=10.3.0 to Ollama service as follows:
 
 ```
-sudo apt install npm
+sudo usermod -aG render,video ollama 2>/dev/null || true
+sudo mkdir -p /etc/systemd/system/ollama.service.d
+printf '[Service]\nEnvironment="HSA_OVERRIDE_GFX_VERSION=10.3.0"\n' | sudo tee /etc/systemd/system/ollama.service.d/override.conf
 ```
 
-16. Install Docker
+### Install Javascript packet manager 
+
+6. Install npm
 
 ```
-ls -ld /etc/apt/keyrings
+sudo apt install -y npm
 ```
 
-If there is nothing in response, type
+### Install Docker Engine
+
+7. Set up Docker apt repository.
 
 ```
-sudo mkdir -p /etc/apt/keyrings
-sudo chmod 755 /etc/apt/keyrings
-```
-
-then
-
-```
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-```
-
-verify with
-
-```
-ls -l /etc/apt/keyrings/docker.asc
-```
-
-set permissions
-
-```
+# Add Docker's official GPG key:
+sudo apt update && sudo apt install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-```
 
-remove previous ones
+# Add the repository to Apt sources:
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
 
-```
-sudo rm -f /etc/apt/sources.list.d/docker.list
-```
-
-make sure your Ubuntu is using proper repo
-
-```
-echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu noble stable" | sudo tee /etc/apt/sources.list.d/docker.list
-```
-
-update apt
-
-```
 sudo apt update
 ```
 
-install docker
+8. Install docker components
 
 ```
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-now let's just fix permissions
+Please visit the official Docker site if you need more information: [https://docs.docker.com/engine/install/debian/](https://docs.docker.com/engine/install/debian/)
+
+9. Add user me to docker group, so you can run docker with `me` user:
 
 ```
-sudo usermod -aG docker $USER
+sudo usermod -aG docker me
 ```
 
-**LOGOUT OF YOUR UBUNTU AND LOGIN AGAIN**
+*LOGOUT OF YOUR SESSION AND LOGIN AGAIN*
 
-now paste this
+10. Check docker with `me` user:
 
 ```
 docker ps
@@ -179,7 +144,7 @@ docker buildx ls
 docker compose version
 ```
 
-the results should be like:
+The results should look like this:
 
 ```
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
@@ -189,76 +154,54 @@ default*      docker
 Docker Compose version v5.3.1
 ```
 
-At this point we should be done with installing all components.
-
-Let's just create external volumes for Docker
+11. Create external volumes for Docker
 
 ```
 docker volume create honey-barrel-stack_hermes_opt
 docker volume create honey-barrel-stack_hermes_data
 ```
+### Setting up permissions
 
-We're done with that part.
+12. Setup folder permissions:
+    
+Set up the following variables:
 
-## Security
-
-Go in terminal back to your git-repo and execute this:
-
-```bash
+```
 export USER=me
 export HOMEDIR=/home/me
-export WORKSPACE=/home/me/git-repo/honey-barrel-finale/workspace
+export WORKSPACE=/home/me/git-repo/honey-barrel/workspace
 ```
 
-then
+Now set up permissionns:
 
-```bash
+```
 mkdir -p $WORKSPACE
 chown $USER:$USER -R $WORKSPACE $WORKSPACE/*
 ```
 
 This step ensures that you have the appropriate permissions to access and modify files within your workspace.
 
-Now navigate to your workspace
+13. Create custom environment file
+    
+Within `/home/me/git-repo/honey-barrel/workspace` create a `.env` file with the following entries. 
 
-```bash
-cd /home/me/git-repo/honey-barrel-finale/workspace
 ```
-
-Create a `.env` file with the following entries. You can find a template in `/honey-barrel-finale/.env.example` — edit this file, then change the name to `.env` and save it in your workspace and make a backup of it somewhere else.
-
-TIP: if you don't see any `.env.example` in your file explorer, press Ctrl+H.
-
-```bash
-OLLAMA_BASE_IP=your.local.ip.address
-OLLAMA_BASE_URL=http://your.local.ip.address:11434
+# Visit https://github.com/settings/tokens and create a tocken for your account
 GITHUB_TOKEN=your_token_here
+
+# Visit https://app.alpaca.markets/ and sign up to get the following information
 ALPACA_API_KEY_ID=your_key
 ALPACA_API_SECRET_KEY=your_secret
+
+# Enter your local IP address and model from ollama list output
+OLLAMA_BASE_IP=your.local.ip.address
+OLLAMA_BASE_URL=http://your.local.ip.address:11434
+OLLAMA_MODEL=batiai/gemma4-e4b:q4
 ```
 
-Your first step is to get your own IP address
-
-```
-ifconfig
-```
-
-You should get something like this in response
-
-```
-wlo1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 192.168.1.18  netmask 255.255.255.0  broadcast 192.168.1.255
-        inet6 fe80::45a0:f42f:7c27:801a  prefixlen 64  scopeid 0x20<link>
-        ether 60:67:20:a0:95:84  txqueuelen 1000  (Ethernet)
-        RX packets 5569602  bytes 8346298843 (8.3 GB)
-        RX errors 0  dropped 6106  overruns 0  frame 0
-        TX packets 2178765  bytes 207867043 (207.8 MB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-```
-
-Copy your.local.ip.address — in my case 192.168.1.18 — and paste it to the file.
-
-Now for the Ollama model you have a standard one that we downloaded in the previous step (`OLLAMA_MODEL=batiai/gemma4-e4b:q4`). If you want to change the model just type:
+---
+**NOTE**
+Make sure the Ollama model you have is the same you downloaded in the previous step. If you want to know the model just type:
 
 ```
 ollama list
@@ -272,10 +215,6 @@ batiai/gemma4-e4b:q4    d682bf87e3a3    5.3 GB    36 minutes ago
 ```
 
 Copy and paste the name to the file.
-
-## Register
-
-Go and set up an Alpaca account and a GitHub account — you will find your keys somewhere in security settings on those pages — then update your `.env` file in any text editor.
 
 ## HB starting the stack
 
