@@ -1,1 +1,0 @@
-{"ticker": "APPL_PLACEHOLDER", "algorithm": "xgboost", "features": ["Close", "Volume", "High", "Low", "RSI_14", "SMA_20", "SMA_50", "MACD", "MACD_Signal", "MACD_Diff", "BB_Position", "Daily_Return", "Volatility", "Price_Range", "Volume_Ratio"], "saved_at": "2026-06-22T16:31:08.698947"}

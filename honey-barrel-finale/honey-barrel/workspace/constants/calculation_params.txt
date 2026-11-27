@@ -1,6 +1,0 @@
-Using provided parameters since policy file read failed:
-buy_confidence_threshold = 0.60
-base_notional_per_trade = 25
-max_notional_per_symbol = 100
-min_trade_qty = 0.01
-qty_step = 0.01

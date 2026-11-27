@@ -1,1 +1,0 @@
-{"ticker": "AMZN", "algorithm": "xgboost", "features": ["Close", "Volume", "High", "Low", "RSI_14", "SMA_20", "SMA_50", "MACD", "MACD_Signal", "MACD_Diff", "BB_Position", "Daily_Return", "Volatility", "Price_Range", "Volume_Ratio"], "saved_at": "2026-07-22T12:46:45.121565"}

@@ -1,1 +1,0 @@
-{"ticker": "MSFT", "algorithm": "xgboost", "features": ["Close", "Volume", "High", "Low", "RSI_14", "SMA_20", "SMA_50", "MACD", "MACD_Signal", "MACD_Diff", "BB_Position", "Daily_Return", "Volatility", "Price_Range", "Volume_Ratio", "PE_Ratio", "Dividend_Yield"], "saved_at": "2026-06-20T05:01:54.985282"}

@@ -1,5 +1,0 @@
-# crontab snapshot
-# user: me
-# captured_at: 2026-07-22T07:00:10+02:00
-
-sudo: interactive authentication is required

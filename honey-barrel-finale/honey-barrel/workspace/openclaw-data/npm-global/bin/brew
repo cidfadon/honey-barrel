@@ -1,8 +1,0 @@
-#!/bin/bash
-if [ "$(id -u)" = "0" ]; then
-    export HOME=/home/linuxbrew
-    export USER=linuxbrew
-    exec runuser -u linuxbrew -- /home/linuxbrew/.linuxbrew/bin/brew "$@"
-else
-    exec /home/linuxbrew/.linuxbrew/bin/brew "$@"
-fi
