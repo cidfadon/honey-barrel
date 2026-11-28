@@ -254,7 +254,18 @@ Copy and paste the *NAME* you get into your `.env` file.
 
 ## Starting the stack
 
-14. Lets create the a full stack with the following coommand:
+14. DNS Good practice
+    
+Before bringing up the stack, it is good practice to configure explicit public DNS servers in Docker's daemon configuration (`/etc/docker/daemon.json`). By default, Docker inherits DNS settings from the host, which can cause intermittent or failed domain resolution (`Temporary failure in name resolution`) inside containers when the host uses local LAN DNS servers, filtering resolvers, or slow ISP nameservers.
+
+Setting reliable upstream DNS servers up front prevents external API connection issues (such as `502 Bad Gateway` errors when querying market or broker endpoints):
+
+```bash
+sudo mkdir -p /etc/docker
+echo '{"dns": ["1.1.1.1", "8.8.8.8"]}' | sudo tee /etc/docker/daemon.json
+sudo systemctl restart docker
+
+15. Lets create the a full stack with the following coommand:
 
 ```bash
 cd ~/git-repo/honey-barrel/workspace/scripts
@@ -337,7 +348,7 @@ sudo apt install -y socat
 socat your.client.ip.address:8080,fork,reuseaddr TCP:127.0.0.1:18001
 ```
 
-15. Finally we will create the MCP servers as follows:
+16. Finally we will create the MCP servers as follows:
 
 ```bash
 docker compose exec hermes hermes mcp add analyst --url http://investment-analyst-api:8001/mcp
@@ -364,10 +375,12 @@ Connecting to http://stdio-terminal:3002/mcp
 Does this server require authentication? [Y/n]: n
 Enable all 1 tools? [Y/n/select]: y
 ```
+---
+**Note:** If you already started the containers before applying this change, restarting the Docker daemon (sudo systemctl restart docker) will automatically recreate the network configuration for containers with restart policies enabled (or you can run docker compose up -d --force-recreate).
 
 ## Last step: Enable crons
 
-16. Copy/paste as `crontab_me_start.bak`
+17. Copy/paste as `crontab_me_start.bak`
 
 ```
 CRON_TZ=Europe/Dublin
