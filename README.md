@@ -10,18 +10,20 @@ This fork adapts the setup for **Debian** after an Ubuntu compatibility issue wi
 
 I have tested this stack on both **Ubuntu 26.04.01** and **Debian 13.5.0** without major issues. Default user **`me`** was used originally for scripts default to `/home/me/git-repo/honey-barrel/workspace`. If you use a different directory layout, keep your paths and environment variables consistent across scripts and cron jobs.
 
-I always like to start from a minimal headless installation with just SSH server and connect to my machine remotely, but if you feel more confortable using a desktop feel free to do it. Finish the installation and reboot the machine into Debian.
+I always like to start from a minimal headless installation with just SSH server and connect to my machine remotely, but if you feel more confortable using a desktop feel free to do it. 
 
 ### Base OS & User Setup
 
 1. Install Debian and while asked to create the new user, create a user named -> `me`. 
+Finish the installation and reboot the machine into Debian.
     
-2. Add user `me` to sudoers: 
+2. Add user `me` to sudoers.
+Because this is a minimal installation, you will need to install sudo and add `me` to sudoers, if you decided to install base system instead you can skip this and jump to the next step.
 
 ```bash
 su -c "apt update && apt install -y sudo && usermod -aG sudo me"
 ```
-Because this is a minimal installation, you will need to install sudo and add `me` to sudoers.
+
 *LOGOUT OF YOUR SESSION AND LOGIN AGAIN*
 
 3. Create the base folder and download the project:
@@ -34,14 +36,14 @@ cd ~/git-repo && git clone https://github.com/cidfadon/honey-barrel.git
 
 ### Install Ollama LLM
 
-4. Install Ollama using curl
+4. Install Ollama using curl:
 
 ```bash
 sudo apt install -y curl 
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-At the end of the installation you should see something like NVIDIA or AMD GPU ready, otherwise a WARNING will be shown.
+At the end of the installation you should see something like *NVIDIA or AMD GPU ready*, otherwise a *WARNING* will be shown.
 
 ---
 **NVIDIA USERS:**
@@ -76,7 +78,7 @@ ollama run batiai/gemma4-e4b:q4 "Sharing is caring. Reply in one short sentence.
 ollama ps
 ```
 
-You should see 100% GPU
+You should see **100% GPU**, otherwise make sure your drivers are installed and Ollama detects your graphics card.
 
 ```
 me@debian:~/git-repo/honey-barrel$ ollama ps
@@ -154,7 +156,7 @@ EOF
 sudo apt update
 ```
 
-8. Install docker components
+8. Install Docker components
 
 ```bash
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -162,7 +164,7 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 
 Please visit the official Docker site if you need more information: [https://docs.docker.com/engine/install/debian/](https://docs.docker.com/engine/install/debian/)
 
-9. Add user me to docker group, so you can run docker with `me` user:
+9. Add user `me` to `docker` group, so you can run Docker with `me` user:
 
 ```bash
 sudo usermod -aG docker me
@@ -248,7 +250,7 @@ NAME                    ID              SIZE      MODIFIED
 batiai/gemma4-e4b:q4    d682bf87e3a3    5.3 GB    36 minutes ago
 ```
 
-Copy and paste the `NAME` you get into your `.env` file.
+Copy and paste the *NAME* you get into your `.env` file.
 
 ## Starting the stack
 
@@ -259,7 +261,7 @@ cd ~/git-repo/honey-barrel/workspace/scripts
 ./full_stack_recompose.sh
 ```
 
-While asked, you always say `YES`. As a result you should see something like this at the end:
+While asked, you always say `Y`. As a result you should see something like this at the end:
 
 ```
 [+] build 6/6
