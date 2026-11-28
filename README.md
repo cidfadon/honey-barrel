@@ -49,14 +49,23 @@ Because most Nvidia drivers are propietary you have to add *contrib* to trixie m
 
 ```bash
 sudo sed -i 's/trixie main non-free-firmware/trixie main contrib non-free non-free-firmware/g' /etc/apt/sources.list
-```
+``` 
 
-Make sure the command has added *contrib* to trixie main:
+Make sure the command has added *contrib* and *non-free* to trixie main:
 
 ```bash
 cat /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null
 ```
+Update your sources and install the Linux headers and download the nvidia driver:
 
+```bash
+sudo apt update && sudo apt install -y linux-headers-$(uname -r)
+sudo apt install nvidia-driver
+```
+Now you have to reboot to load the new driver
+```bash
+sudo reboot
+```
 
 5. Download the following model and run a test query.  
 
@@ -79,7 +88,7 @@ batiai/gemma4-e4b:q4    d682bf87e3a3    3.3 GB    100% GPU     131072     llamac
 **RADEON USERS:**
 In one of my tests, it happened to me that the model was running 100% CPU despite I have a 12GB Radeon and I got my card detected after Ollama installation. 
 
-To solve this I had to add ollama to render and video groups and add HSA_OVERRIDE_GFX_VERSION=10.3.0 to Ollama service as follows:
+To solve this I had to add `ollama` to `render` and `video` groups and add `HSA_OVERRIDE_GFX_VERSION=10.3.0` to Ollama service as follows:
 
 ```bash
 sudo usermod -aG render,video ollama 2>/dev/null || true
@@ -206,7 +215,7 @@ chmod +x $WORKSPACE/scripts/*.sh
 ```
 This step ensures that you have the appropriate permissions within your workspace.
 
-13. Create custom environment file
+13. Create custom environment file:
     
 Within `/home/me/git-repo/honey-barrel/workspace` create a `.env` file with the following entries. 
 
@@ -232,16 +241,16 @@ Make sure the Ollama model you have is the same you downloaded in the previous s
 ollama list
 ```
 
-Expect a response like
+Expect a response like this:
 
 ```
 NAME                    ID              SIZE      MODIFIED
 batiai/gemma4-e4b:q4    d682bf87e3a3    5.3 GB    36 minutes ago
 ```
 
-Copy and paste the name to the file.
+Copy and paste the `NAME` you get into your `.env` file.
 
-## HB starting the stack
+## Starting the stack
 
 14. Lets create the a full stack with the following coommand:
 
@@ -250,7 +259,7 @@ cd ~/git-repo/honey-barrel/workspace/scripts
 ./full_stack_recompose.sh
 ```
 
-While asked, you always say YES. As a result you should see something like this at the end:
+While asked, you always say `YES`. As a result you should see something like this at the end:
 
 ```
 [+] build 6/6
@@ -335,7 +344,7 @@ docker compose exec hermes hermes mcp add alpaca --url http://alpaca-mcp:3001/mc
 docker compose exec hermes hermes mcp add terminal --url http://stdio-terminal:3002/mcp
 ```
 
-While connecting the servers you have to answer first ``NO`` for authentication and then ``YES`` to enable all the tools:
+While connecting the servers you have to answer first ``n`` for authentication and then ``y`` to enable all the tools:
 
 ```
 Connecting to http://investment-analyst-api:8001/mcp
